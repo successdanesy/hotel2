@@ -1,0 +1,204 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    display: flex;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f4f9;
+  }
+  
+  .sidebar {
+    width: 80px;
+    background-color: #333;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+  
+  .sidebar .icon {
+    margin: 20px 0;
+    font-size: 24px;
+    color: #fff;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  .sidebar .icon:hover {
+    color: #007bff;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    background-color: #007bff;
+    padding: 10px;
+    border-radius: 4px;
+    color: white;
+  }
+  
+  .search-bar {
+    width: 60%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .button {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .button i {
+    margin-right: 5px;
+  }
+  
+  .button:hover {
+    background-color: #0056b3;
+  }
+  
+  .new-guest a {
+    text-decoration: none;
+    color: white;
+  }
+  
+  .welcome {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .welcome i {
+    margin-right: 5px;
+  }
+  
+  .dashboard {
+    padding: 20px;
+  }
+  
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 20px;
+  }
+  
+  .room-management, .service-requests, .kitchen-order, .bar-order {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .room-management h2, .service-requests h2, .kitchen-order h2, .bar-order h2 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+  }
+  
+  .room-status, .request-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .service-requests .request-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  th, td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  th i {
+    margin-right: 8px;
+  }
+  
+  .view-tasks a, .view-schedule a {
+    text-decoration: none;
+    color: white;
+  }
+  
+  .welcome {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .welcome i {
+    margin-right: 5px;
+  }
+  
+  table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  table th {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  table td {
+    text-align: left;
+    padding: 12px 15px;
+  }
+  
+  /* Styling for dynamically loaded content */
+  .kitchen-order, .bar-order {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  #kitchen-orders, #bar-orders {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  #kitchen-orders td, #bar-orders td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  #kitchen-orders th, #bar-orders th {
+    background-color: #007bff;
+    color: white;
+    text-align: left;
+    padding: 10px;
+  }
+  
+  #kitchen-orders td, #bar-orders td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+  
