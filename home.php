@@ -63,7 +63,7 @@ $result_bar = $conn->query($sql_bar);
                         <div class="rooms-header">Check Rooms</div>
                         <p>These are the available rooms</p>
                         <button class="button view-tasks">
-                            <i class="fas fa-tasks"></i> <a href="rooms.php">View all rooms</a>
+                            <i class="fas fa-tasks"></i> <a href="room.php">View all rooms</a>
                         </button>
                     </div>
                 </section>

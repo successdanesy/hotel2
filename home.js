@@ -1,36 +1,46 @@
-// Fetch kitchen and bar orders dynamically
-// Fetch data from get_orders.php
+// Function to fetch kitchen and bar orders
 function fetchOrders() {
+    // Use Fetch API to get data from get_orders.php
     fetch('get_orders.php')
-    .then(response => response.json())
-    .then(data => {
-        // Bar orders section
-        let barOrdersContainer = document.querySelector('.bar-order table');
-        barOrdersContainer.innerHTML = '';
-        data.bar_orders.forEach(order => {
-            let row = `<tr>
-                          <td>Room ${order.room_number} - ${order.order_description} (${order.status})</td>
-                       </tr>`;
-            barOrdersContainer.innerHTML += row;
-        });
+        .then(response => response.json()) // Parse the response as JSON
+        .then(data => {
+            // Update the kitchen orders table
+            const kitchenOrdersTable = document.getElementById('kitchen-orders');
+            kitchenOrdersTable.innerHTML = '<tr><th><i class="fas fa-utensils"></i> Room Orders</th></tr>'; // Clear previous data
+            if (data.kitchen.length > 0) {
+                data.kitchen.forEach(order => {
+                    const row = kitchenOrdersTable.insertRow();
+                    const cell = row.insertCell(0);
+                    cell.textContent = `Room ${order.room_number} - ${order.order_description} (Status: ${order.status})`;
+                });
+            } else {
+                const row = kitchenOrdersTable.insertRow();
+                const cell = row.insertCell(0);
+                cell.textContent = 'No kitchen orders available.';
+            }
 
-        // Kitchen orders section
-        let kitchenOrdersContainer = document.querySelector('.kitchen-order table');
-        kitchenOrdersContainer.innerHTML = '';
-        data.kitchen_orders.forEach(order => {
-            let row = `<tr>
-                          <td>Room ${order.room_number} - ${order.order_description} (${order.status})</td>
-                       </tr>`;
-            kitchenOrdersContainer.innerHTML += row;
+            // Update the bar orders table
+            const barOrdersTable = document.getElementById('bar-orders');
+            barOrdersTable.innerHTML = '<tr><th><i class="fas fa-glass-cheers"></i> Room Orders</th></tr>'; // Clear previous data
+            if (data.bar.length > 0) {
+                data.bar.forEach(order => {
+                    const row = barOrdersTable.insertRow();
+                    const cell = row.insertCell(0);
+                    cell.textContent = `Room ${order.room_number} - ${order.order_description} (Status: ${order.status})`;
+                });
+            } else {
+                const row = barOrdersTable.insertRow();
+                const cell = row.insertCell(0);
+                cell.textContent = 'No bar orders available.';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching orders:', error);
         });
-    })
-    .catch(error => {
-        console.error('Error fetching orders:', error);
-    });
 }
 
-// Fetch orders when the page loads
-window.onload = fetchOrders;
+// Call fetchOrders initially when the page loads
+fetchOrders();
 
-// Optionally, you can refresh the orders every 10 seconds to simulate real-time updates
-setInterval(fetchOrders, 10000); // Fetch orders every 10 seconds
+// Set an interval to refresh the orders every 10 seconds (10000 ms)
+setInterval(fetchOrders, 10000);
