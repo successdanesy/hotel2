@@ -6,7 +6,7 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #f4f4f9;
+    background: linear-gradient(to bottom, #f4f4f9, #e8ecf0);
     padding: 20px;
     color: #333;
 }
@@ -21,6 +21,11 @@ header {
     padding: 10px 20px;
     border-radius: 8px;
     color: white;
+}
+
+header h1 {
+    font-size: 2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 header .search-bar {
@@ -73,11 +78,12 @@ header .welcome i {
 
 /* Section titles */
 h2 {
-    font-size: 18px;
-    color: #333;
+    font-size: 1.5rem;
+    color: #007bff;
     margin-bottom: 10px;
     border-bottom: 2px solid #ddd;
     padding-bottom: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Table styles */
@@ -87,19 +93,28 @@ table {
     margin-top: 10px;
 }
 
-th, td {
+th {
+    position: sticky;
+    top: 0;
+    background-color: #007bff;
+    color: white;
+    padding: 8px;
+    z-index: 10;
+}
+
+td {
     padding: 8px;
     border: 1px solid #ddd;
     text-align: center;
 }
 
-th {
-    background-color: #007bff;
-    color: white;
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
+table tr:hover {
+    background-color: #f1f9ff;
+    transition: background-color 0.3s ease;
 }
 
 /* Button styles */
@@ -113,9 +128,11 @@ button {
     cursor: pointer;
     font-size: 1rem;
     margin-top: 10px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 button:hover {
+    transform: translateY(-3px);
     background-color: #0056b3;
 }
 
@@ -130,7 +147,8 @@ form label {
     font-weight: bold;
 }
 
-form input, form select {
+form input,
+form select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
@@ -170,23 +188,60 @@ form button {
 }
 
 .alert.success {
-    background-color: #d4edda;
+    background-color: #d1f5d3;
     color: #155724;
-    border: 1px solid #c3e6cb;
+    border: 1px solid #91d991;
 }
 
 .alert.error {
-    background-color: #f8d7da;
+    background-color: #fde0e0;
     color: #721c24;
-    border: 1px solid #f5c6cb;
+    border: 1px solid #f5a9a9;
+}
+
+/* Add Room Link Section */
+.add-room-link {
+    margin-top: 30px;
+}
+
+.add-room-link .button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745;
+    font-size: 1rem;
+    text-align: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.add-room-link .button:hover {
+    transform: translateY(-3px);
+    background-color: #218838;
+}
+
+/* Back to Room Management Button */
+.back-to-room-management {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.back-to-room-management .button {
+    background-color: #ffc107;
+    font-size: 1rem;
+    padding: 8px 16px;
+}
+
+.back-to-room-management .button:hover {
+    background-color: #e0a800;
 }
 
 /* Footer */
 footer {
     text-align: center;
-    padding: 10px;
+    padding: 15px;
     margin-top: 20px;
     background-color: #007bff;
     color: white;
     border-radius: 8px;
+    font-size: 0.9rem;
 }

@@ -74,27 +74,15 @@ while ($row = $result->fetch_assoc()) {
             </form>
         </section>
 
-        <!-- Add Room Form -->
-        <section class="add-room">
-            <h2>Add a New Room</h2>
-            <form id="add-room-form" method="POST" action="add_room.php">
-                <label for="room_number">Room Number:</label>
-                <input type="text" id="room_number" name="room_number" required>
+        <!-- Link to Create Room Page -->
+        <section class="add-room-link">
+    <h2>Add a New Room</h2>
+    <form action="create_room.php" method="GET">
+        <button type="submit" class="button">Go to Add Room Page</button>
+    </form>
+</section>
 
-                <label for="room_type">Room Type:</label>
-                <select id="room_type" name="room_type" required>
-                    <option value="Single">Single</option>
-                    <option value="Double">Double</option>
-                    <option value="Suite">Suite</option>
-                    <option value="Family">Family</option>
-                </select>
 
-                <label for="price">Price (per night):</label>
-                <input type="number" id="price" name="price" step="0.01" required>
-
-                <button type="submit">Add Room</button>
-            </form>
-        </section>
 
         <!-- Room Table -->
         <section class="room-list">
@@ -145,4 +133,10 @@ while ($row = $result->fetch_assoc()) {
         </section>
     </div>
 </body>
+
+<!-- Footer Section -->
+<footer>
+    <p>&copy; 2024 Antilla Apartments & Suits. All rights reserved.</p>
+</footer>
+
 </html>
