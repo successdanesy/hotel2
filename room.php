@@ -30,7 +30,7 @@ if (isset($_GET['error'])) {
 $room_type_filter = isset($_GET['room_type']) ? $_GET['room_type'] : 'All';
 
 // Build the query based on the room type filter
-$query = "SELECT room_number, status, room_type, price FROM rooms";
+$query = "SELECT room_number, status, room_type, weekday_price, weekend_price FROM rooms";
 if ($room_type_filter != 'All') {
     $query .= " WHERE room_type = '$room_type_filter'";
 }
@@ -60,29 +60,27 @@ while ($row = $result->fetch_assoc()) {
         </header>
 
         <!-- Room Filter Form -->
-        <section class="room-filter">
-            <h2>Filter Rooms</h2>
-            <form action="room.php" method="GET">
-                <label for="room_type">Room Type:</label>
-                <select id="room_type" name="room_type" onchange="this.form.submit()">
-                    <option value="All" <?php echo $room_type_filter == 'All' ? 'selected' : ''; ?>>All</option>
-                    <option value="Single" <?php echo $room_type_filter == 'Single' ? 'selected' : ''; ?>>Single</option>
-                    <option value="Double" <?php echo $room_type_filter == 'Double' ? 'selected' : ''; ?>>Double</option>
-                    <option value="Suite" <?php echo $room_type_filter == 'Suite' ? 'selected' : ''; ?>>Suite</option>
-                    <option value="Family" <?php echo $room_type_filter == 'Family' ? 'selected' : ''; ?>>Family</option>
-                </select>
-            </form>
-        </section>
-
-        <!-- Link to Create Room Page -->
-        <section class="add-room-link">
-    <h2>Add a New Room</h2>
-    <form action="create_room.php" method="GET">
-        <button type="submit" class="button">Go to Add Room Page</button>
+<section class="room-filter">
+    <h2>Filter Rooms</h2>
+    <form action="room.php" method="GET">
+        <label for="room_type">Room Type:</label>
+        <select id="room_type" name="room_type" onchange="this.form.submit()">
+            <option value="All" <?php echo $room_type_filter == 'All' ? 'selected' : ''; ?>>All</option>
+            <option value="Standard" <?php echo $room_type_filter == 'Standard' ? 'selected' : ''; ?>>Standard</option>
+            <option value="Executive" <?php echo $room_type_filter == 'Executive' ? 'selected' : ''; ?>>Executive</option>
+            <option value="Luxury" <?php echo $room_type_filter == 'Luxury' ? 'selected' : ''; ?>>Luxury</option>
+        </select>
     </form>
 </section>
 
 
+        <!-- Link to Create Room Page -->
+        <section class="add-room-link">
+            <h2>Add a New Room</h2>
+            <form action="create_room.php" method="GET">
+                <button type="submit" class="button">Go to Add Room Page</button>
+            </form>
+        </section>
 
         <!-- Room Table -->
         <section class="room-list">
@@ -106,12 +104,22 @@ while ($row = $result->fetch_assoc()) {
                             <td class="<?php echo strtolower(str_replace(' ', '-', $room['status'])); ?>">
                                 <?php echo ucfirst($room['status']); ?>
                             </td>
-                            <td><?php echo "$" . number_format($room['price'], 2); ?></td>
+                            <td>
+                                <?php 
+                                    // Calculate the price based on weekday or weekend
+                                    $current_day = date('l');
+                                    if ($current_day == 'Friday' || $current_day == 'Saturday' || $current_day == 'Sunday') {
+                                        echo "₦" . number_format($room['weekend_price'], 2) . " (Weekend)";
+                                    } else {
+                                        echo "₦" . number_format($room['weekday_price'], 2) . " (Weekday)";
+                                    }
+                                ?>
+                            </td>
                             <td>
                                 <?php if ($room['status'] == 'Available'): ?>
-                                    <form action="checkin.php" method="POST">
+                                    <form action="book_room.php" method="POST">
                                         <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
-                                        <button type="submit" class="button checkin-btn">Check-in</button>
+                                        <button type="submit" class="button book-btn">Book Now</button>
                                     </form>
                                 <?php elseif ($room['status'] == 'Occupied'): ?>
                                     <form action="checkout.php" method="POST" class="checkout-form">
@@ -136,7 +144,7 @@ while ($row = $result->fetch_assoc()) {
 
 <!-- Footer Section -->
 <footer>
-    <p>&copy; 2024 Antilla Apartments & Suits. All rights reserved.</p>
+    <p>&copy; 2024 Antilla Apartments & Suites. All rights reserved.</p>
 </footer>
 
 </html>

@@ -14,12 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get room details from the form
     $room_number = htmlspecialchars($_POST['room_number']);
     $room_type = htmlspecialchars($_POST['room_type']);
-    $price = htmlspecialchars($_POST['price']);
+    $weekday_price = htmlspecialchars($_POST['weekday_price']);
+    $weekend_price = htmlspecialchars($_POST['weekend_price']);
 
     // Insert the new room into the database
-    $query = "INSERT INTO rooms (room_number, room_type, status, price) VALUES (?, ?, 'Available', ?)";
+    $query = "INSERT INTO rooms (room_number, room_type, status, weekday_price, weekend_price) VALUES (?, ?, 'Available', ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssd", $room_number, $room_type, $price);
+    $stmt->bind_param("ssdd", $room_number, $room_type, $weekday_price, $weekend_price);
 
     if ($stmt->execute()) {
         // Redirect to room.php with a success message
@@ -66,23 +67,25 @@ if (isset($_GET['error'])) {
 
                 <label for="room_type">Room Type:</label>
                 <select id="room_type" name="room_type" required>
-                    <option value="Single">Single</option>
-                    <option value="Double">Double</option>
-                    <option value="Suite">Suite</option>
-                    <option value="Family">Family</option>
+                    <option value="Standard" <?php echo (isset($room_type) && $room_type == 'Standard') ? 'selected' : ''; ?>>Standard</option>
+                    <option value="Executive" <?php echo (isset($room_type) && $room_type == 'Executive') ? 'selected' : ''; ?>>Executive</option>
+                    <option value="Luxury" <?php echo (isset($room_type) && $room_type == 'Luxury') ? 'selected' : ''; ?>>Luxury</option>
                 </select>
 
-                <label for="price">Price (per night):</label>
-                <input type="number" id="price" name="price" step="0.01" required>
+                <label for="weekday_price">Weekday Price (per night):</label>
+                <input type="number" id="weekday_price" name="weekday_price" step="0.01" required>
+
+                <label for="weekend_price">Weekend Price (per night):</label>
+                <input type="number" id="weekend_price" name="weekend_price" step="0.01" required>
 
                 <button type="submit">Add Room</button>
             </form>
             
             <section class="back-to-room-management">
-    <form action="room.php" method="GET">
-        <button type="submit" class="button back-button">Back to Room Management</button>
-    </form>
-</section>
+                <form action="room.php" method="GET">
+                    <button type="submit" class="button back-button">Back to Room Management</button>
+                </form>
+            </section>
 
         </section>
     </div>
