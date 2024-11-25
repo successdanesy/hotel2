@@ -17,12 +17,29 @@ if (isset($_GET['logout'])) {
 require_once 'server.php'; // To include your database connection
 
 // Fetching Kitchen Orders
-$sql_kitchen = "SELECT * FROM kitchen_orders"; // Adjust this query based on your table and schema
+$sql_kitchen = "SELECT * FROM kitchen_orders WHERE status = 'completed'"; // Only fetching completed orders
 $result_kitchen = $conn->query($sql_kitchen);
 
 // Fetching Bar Orders
 $sql_bar = "SELECT * FROM bar_orders"; // Adjust this query based on your table and schema
 $result_bar = $conn->query($sql_bar);
+
+
+// Fetch orders marked as 'sent to front desk'
+$query = "SELECT * FROM kitchen_orders WHERE status = 'sent to front desk'";
+$result = $conn->query($query);
+
+// Logic to notify the front desk if there are new orders
+if ($result->num_rows > 0) {
+    // You can add any kind of notification system, for example, sound or alert
+    echo "<script>
+            var audio = new Audio('notification.mp3'); // Add your notification sound file
+            audio.play();
+            alert('New kitchen order received!');
+          </script>";
+}
+
+// Fetch all orders and display them as needed
 
 ?>
 
@@ -50,10 +67,11 @@ $result_bar = $conn->query($sql_bar);
         <header>
             <input type="text" placeholder="Search rooms, services, and guests" class="search-bar">
             <a href="room.php" class="button new-guest">
-    <i class="fas fa-user-plus"></i> New Guest
-    <a href="logout.php" class="btn btn-dark">Logout</a>
-</a>
-
+                <i class="fas fa-user-plus"></i> New Guest
+            </a>
+            <a href="logout.php" class="button new-guest">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
             <div class="welcome"><i class="fas fa-user-circle"></i> Welcome <?php echo $_SESSION['username']; ?></div>
         </header>
 
@@ -138,6 +156,22 @@ $result_bar = $conn->query($sql_bar);
         </div>
     </div>
 
+    <!-- Notification Bar and Sound -->
+    <div id="notification-bar" style="display: none; background-color: green; color: white; padding: 10px; text-align: center;">
+        <strong>New Completed Order!</strong> A completed order has been received.
+    </div>
+
+    <audio id="notification-sound" src="notification.mp3" preload="auto"></audio>
+
+
     <script src="home.js"></script>
+
+    <script>
+    // Call the function to show notification when the page loads
+<?php if ($result_kitchen->num_rows > 0): ?>
+    showNotification(); // Trigger the notification if there are completed orders
+<?php endif; ?>
+</script>
+
 </body>
 </html>
