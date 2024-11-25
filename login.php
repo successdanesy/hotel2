@@ -1,6 +1,61 @@
 <?php 
 session_start();
+include('db_connect.php'); // Include the database connection
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login_user'])) {
+    // Get form data
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Query to get the stored hashed password and role from the database
+    $query = "SELECT username, password, role FROM users WHERE username = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    // Check if the username exists in the database
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        
+        // Verify the entered password against the hashed password stored in the database
+        if (password_verify($password, $user['password'])) {
+            // Set session variables
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role']; // Store role for access control
+
+            // Redirect based on role
+            if ($user['role'] === 'admin') {
+                header('Location: home.php');
+                exit();
+            } elseif ($user['role'] === 'kitchen') {
+                header('Location: kitchen.php');
+                exit();
+            } elseif ($user['role'] === 'bar') {
+                header('Location: bar.php');
+                exit();
+            } elseif ($user['role'] === 'manager') {
+                header('Location: manager.php');
+                exit();
+            } else {
+                $_SESSION['msg'] = "Invalid user role.";
+                header('Location: login.php');
+                exit();
+            }
+        } else {
+            $_SESSION['msg'] = "Invalid username or password.";
+            header('Location: login.php');
+            exit();
+        }
+    } else {
+        $_SESSION['msg'] = "User not found.";
+        header('Location: login.php');
+        exit();
+    }
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +87,7 @@ session_start();
             </div>
             <?php endif ?>
 
-            <form id="login-form" method="POST" action="server.php">
+            <form id="login-form" method="POST" action="login.php">
                 <div class="input-group">
                     <label for="username">Username</label>
                     <input type="text" name="username" id="username" placeholder="Enter your username" required>

@@ -1,0 +1,155 @@
+/* General Layout */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.main-content {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styling */
+header h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+header p {
+    font-size: 1em;
+    color: #666;
+}
+
+/* Form Styling */
+form {
+    margin: 20px 0;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.alert {
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Guest List Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table th,
+table td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+table th {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Action Buttons */
+.action-buttons button {
+    margin: 5px;
+    font-size: 0.9em;
+}
+
+.action-buttons button.edit {
+    background-color: #ffc107;
+}
+
+.action-buttons button.edit:hover {
+    background-color: #e0a800;
+}
+
+.action-buttons button.view {
+    background-color: #17a2b8;
+}
+
+.action-buttons button.view:hover {
+    background-color: #138496;
+}
+
+.action-buttons button.delete {
+    background-color: #dc3545;
+}
+
+.action-buttons button.delete:hover {
+    background-color: #c82333;
+}
+
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}

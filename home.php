@@ -49,7 +49,11 @@ $result_bar = $conn->query($sql_bar);
         <!-- Header -->
         <header>
             <input type="text" placeholder="Search rooms, services, and guests" class="search-bar">
-            <button class="button new-guest"><i class="fas fa-user-plus"></i><a href="guest.html">New Guest</a></button>
+            <a href="room.php" class="button new-guest">
+    <i class="fas fa-user-plus"></i> New Guest
+    <a href="logout.php" class="btn btn-dark">Logout</a>
+</a>
+
             <div class="welcome"><i class="fas fa-user-circle"></i> Welcome <?php echo $_SESSION['username']; ?></div>
         </header>
 
@@ -64,6 +68,9 @@ $result_bar = $conn->query($sql_bar);
                         <p>These are the available rooms</p>
                         <button class="button view-tasks">
                             <i class="fas fa-tasks"></i> <a href="room.php">View all rooms</a>
+                        </button>
+                        <button class="button view-tasks">
+                            <i class="fas fa-tasks"></i> <a href="guest_management.php">Guest Management</a>
                         </button>
                     </div>
                 </section>

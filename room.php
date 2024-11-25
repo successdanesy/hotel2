@@ -116,24 +116,31 @@ while ($row = $result->fetch_assoc()) {
                                 ?>
                             </td>
                             <td>
-                                <?php if ($room['status'] == 'Available'): ?>
-                                    <form action="book_room.php" method="POST">
-                                        <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
-                                        <button type="submit" class="button book-btn">Book Now</button>
-                                    </form>
-                                <?php elseif ($room['status'] == 'Occupied'): ?>
-                                    <form action="checkout.php" method="POST" class="checkout-form">
-                                        <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
-                                        <button type="submit" class="button checkout-btn">Check-out</button>
-                                    </form>
-                                    <form action="extend_stay.php" method="POST" class="extend-form">
-                                        <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
-                                        <button type="submit" class="button extend-btn">Extend Stay</button>
-                                    </form>
-                                <?php else: ?>
-                                    <span class="status under-maintenance">Under Maintenance</span>
-                                <?php endif; ?>
-                            </td>
+    <?php if ($room['status'] == 'Available'): ?>
+        <!-- Redirect to checkin_form.php -->
+        <form action="checkin_form.php" method="GET">
+            <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
+            <button type="submit" class="button book-btn">Book Now</button>
+        </form>
+    <?php elseif ($room['status'] == 'Occupied'): ?>
+        <!-- Check-out and Extend Stay Buttons -->
+        <form action="checkout.php" method="POST">
+    <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
+    <button type="submit" class="button checkout-btn">Check-out</button>
+</form>
+
+<form action="extend_stay.php" method="POST">
+    <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
+    <label for="new_checkout_date">New Checkout Date:</label>
+    <input type="date" name="new_checkout_date" required>
+    <button type="submit" class="button extend-btn">Extend Stay</button>
+</form>
+    <?php else: ?>
+        <!-- Under Maintenance Status -->
+        <span class="status under-maintenance">Under Maintenance</span>
+    <?php endif; ?>
+</td>
+
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
