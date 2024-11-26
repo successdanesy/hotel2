@@ -36,7 +36,7 @@ $(document).on('submit', '#order-form', function(e) {
 // Handle marking an order as completed via AJAX
 function markAsComplete(orderId) {
     $.ajax({
-        url: 'kitchen.php',
+        url: 'kitchen.php',  // The same PHP file that handles order completion
         type: 'POST',
         data: {
             mark_completed: true,
@@ -46,14 +46,20 @@ function markAsComplete(orderId) {
             // Parse the JSON response from the server
             var data = JSON.parse(response);
 
-            if (data.status === 'sent to front desk') {
+            if (data.status === 'Completed') {
                 // Update the order status in the table dynamically
-                $('#order-status-' + orderId).text('Sent to Front Desk');
-                $('#order-status-' + orderId).addClass('sent-to-front-desk');  // You can also add a custom CSS class if needed
+                $('#order-status-' + orderId).text('Completed'); // Update status text
+                $('#order-status-' + orderId).addClass('completed');  // Optional: add a custom class for styling
+            } else {
+                alert('Failed to update order status: ' + data.message);  // Handle any errors
             }
+        },
+        error: function() {
+            alert('There was an error processing your request.');
         }
     });
 }
+
 
 // Fetch and update the orders table dynamically
 function fetchOrders() {
@@ -70,33 +76,6 @@ $(document).ready(function() {
     fetchOrders();
 });
 
-// Handle marking an order as completed via AJAX
-// Handle marking an order as completed via AJAX
-function markAsComplete(orderId) {
-    $.ajax({
-        url: 'mark_order.php',  // Use the mark_order.php for updating the status
-        type: 'POST',
-        data: {
-            mark_completed: true,
-            order_id: orderId
-        },
-        success: function(response) {
-            // Parse the JSON response from the server
-            var data = JSON.parse(response);
-
-            if (data.status === 'Completed') {
-                // Update the order status in the table dynamically
-                $('#order-status-' + orderId).text('Completed');
-                $('#order-status-' + orderId).addClass('completed');  // Optional: add a custom class for styling
-            } else {
-                alert('Failed to update order status: ' + data.message);  // Handle any errors
-            }
-        },
-        error: function() {
-            alert('There was an error processing your request.');
-        }
-    });
-}
 
 let orders = []; // Store the orders
 let totalAmount = 0;

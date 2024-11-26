@@ -52,17 +52,18 @@ if (isset($_POST['submit_order'])) {
 if (isset($_POST['mark_completed'])) {
     $order_id = $_POST['order_id'];
 
-    // Update the order status to "sent to front desk"
-    $query = "UPDATE kitchen_orders SET status = 'sent to front desk' WHERE id = ?";
+    // Update the order status to "Completed"
+    $query = "UPDATE kitchen_orders SET status = 'Completed' WHERE id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $stmt->close();
 
     // Return success response
-    echo json_encode(['status' => 'sent to front desk']);
+    echo json_encode(['status' => 'Completed']);  // Make sure to send a 'Completed' status
     exit();
 }
+
 
 // Fetch all orders from the kitchen_orders table
 function fetchOrders() {
