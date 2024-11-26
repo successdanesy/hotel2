@@ -4,12 +4,21 @@ include('db_connect.php'); // Database connection
 
 // Handle form submission for adding a new order
 if (isset($_POST['submit_order'])) {
-    $room_number = $_POST['room_number'] ?? '';
-    $menu_item = $_POST['menu_item'] ?? '';  // Now using the menu item ID
+    $room_number_id = $_POST['room_number'] ?? '';  // The room ID is selected from the dropdown
+    $menu_item = $_POST['menu_item'] ?? '';  
     $special_instructions = $_POST['special_instructions'] ?? '';
 
     // Validate required fields
-    if (!empty($room_number) && !empty($menu_item)) {
+    if (!empty($room_number_id) && !empty($menu_item)) {
+        // Fetch the room number from the rooms table based on the selected room ID
+        $query = "SELECT room_number FROM rooms WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $room_number_id); // Get the room number based on the ID
+        $stmt->execute();
+        $stmt->bind_result($room_number);
+        $stmt->fetch();
+        $stmt->close();
+
         // Fetch the name and price of the selected menu item
         $query = "SELECT name, price FROM menu_items WHERE id = ?";
         $stmt = $conn->prepare($query);
@@ -19,12 +28,12 @@ if (isset($_POST['submit_order'])) {
         $stmt->fetch();
         $stmt->close();
 
-        // If the item was found, proceed with inserting the order
-        if ($name && $price) {
+        // If the room number and item were found, proceed with inserting the order
+        if ($room_number && $name && $price) {
             // Set order description to the name of the menu item only
             $order_description = $name;  // Only menu item name (e.g., "Pasta")
 
-            // Insert the order into kitchen_orders table
+            // Insert the order into kitchen_orders table with the correct room number (NOT room ID)
             $insert_query = "INSERT INTO kitchen_orders (room_number, order_description, status, timestamp, total_amount, special_instructions) 
                              VALUES (?, ?, 'pending', NOW(), ?, ?)";
             $insert_stmt = $conn->prepare($insert_query);
@@ -41,12 +50,13 @@ if (isset($_POST['submit_order'])) {
 
             $insert_stmt->close();
         } else {
-            echo "Menu item not found.";
+            echo "Room or menu item not found.";
         }
     } else {
         echo "Please fill out all required fields.";
     }
 }
+
 
 // Handle marking order as completed
 if (isset($_POST['mark_completed'])) {
@@ -64,7 +74,6 @@ if (isset($_POST['mark_completed'])) {
     exit();
 }
 
-
 // Fetch all orders from the kitchen_orders table
 function fetchOrders() {
     global $conn;
@@ -75,7 +84,6 @@ function fetchOrders() {
 
 $orders = fetchOrders();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +103,21 @@ $orders = fetchOrders();
     <form id="add-order-form" method="POST">
         <div>
             <label for="room_number">Room Number:</label>
-            <input type="text" name="room_number" id="room_number" required>
+            <select name="room_number" id="room_number" required>
+                <?php
+                // Fetch only occupied rooms from the rooms table
+                $query = "SELECT id, room_number FROM rooms WHERE status = 'Occupied'";
+                $result = $conn->query($query);
+
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<option value='" . $row['id'] . "'>" . $row['room_number'] . "</option>";
+                    }
+                } else {
+                    echo "<option value=''>No occupied rooms available</option>";
+                }
+                ?>
+            </select>
         </div>
         <div>
             <label for="menu_item">Select Menu Item:</label>
