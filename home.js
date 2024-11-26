@@ -40,23 +40,6 @@ function fetchOrders() {
 
 
 
-
-// Function to show the notification and play sound
-function showNotification() {
-    var notificationBar = document.getElementById('notification-bar');
-    var sound = document.getElementById('notification-sound');
-
-    // Show the notification bar
-    notificationBar.style.display = 'block';
-
-    // Play the notification sound
-    sound.play();
-
-    // Hide the notification after 5 seconds
-    setTimeout(function() {
-        notificationBar.style.display = 'none';
-    }, 5000);
-}
 }
 
 // Call fetchOrders initially when the page loads
