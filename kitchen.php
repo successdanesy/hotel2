@@ -4,19 +4,48 @@ include('db_connect.php'); // Database connection
 
 // Handle form submission for adding a new order
 if (isset($_POST['submit_order'])) {
-    $room_number = $_POST['room_number'];
-    $order_description = $_POST['order_description'];
+    $room_number = $_POST['room_number'] ?? '';
+    $menu_item = $_POST['menu_item'] ?? '';  // Now using the menu item ID
+    $special_instructions = $_POST['special_instructions'] ?? '';
 
-    // Insert new order into kitchen_orders table with 'pending' status
-    $query = "INSERT INTO kitchen_orders (room_number, order_description, status) VALUES (?, ?, 'pending')";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $room_number, $order_description);
-    $stmt->execute();
-    $stmt->close();
+    // Validate required fields
+    if (!empty($room_number) && !empty($menu_item)) {
+        // Fetch the name and price of the selected menu item
+        $query = "SELECT name, price FROM menu_items WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $menu_item);
+        $stmt->execute();
+        $stmt->bind_result($name, $price);
+        $stmt->fetch();
+        $stmt->close();
 
-    // Redirect after form submission to avoid re-posting on refresh
-    header('Location: kitchen.php');
-    exit();
+        // If the item was found, proceed with inserting the order
+        if ($name && $price) {
+            // Set order description to the name of the menu item only
+            $order_description = $name;  // Only menu item name (e.g., "Pasta")
+
+            // Insert the order into kitchen_orders table
+            $insert_query = "INSERT INTO kitchen_orders (room_number, order_description, status, timestamp, total_amount, special_instructions) 
+                             VALUES (?, ?, 'pending', NOW(), ?, ?)";
+            $insert_stmt = $conn->prepare($insert_query);
+            $insert_stmt->bind_param("ssds", $room_number, $order_description, $price, $special_instructions);
+            
+            // Execute the insert
+            if ($insert_stmt->execute()) {
+                // Redirect to avoid form resubmission on refresh
+                header('Location: kitchen.php');
+                exit();
+            } else {
+                echo "Error inserting order: " . $insert_stmt->error;
+            }
+
+            $insert_stmt->close();
+        } else {
+            echo "Menu item not found.";
+        }
+    } else {
+        echo "Please fill out all required fields.";
+    }
 }
 
 // Handle marking order as completed
@@ -35,135 +64,56 @@ if (isset($_POST['mark_completed'])) {
     exit();
 }
 
-
-
 // Fetch all orders from the kitchen_orders table
 function fetchOrders() {
     global $conn;
-    $query = "SELECT * FROM kitchen_orders ORDER BY timestamp DESC";
+    $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp FROM kitchen_orders ORDER BY timestamp DESC";
     $result = $conn->query($query);
     return $result;
 }
 
 $orders = fetchOrders();
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitchen Orders</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .button {
-            padding: 8px 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #45a049;
-        }
-        .sent-to-front-desk {
-            color: green;
-        }
-        .completed {
-            color: green;
-            font-weight: bold;
-        }
+    <link rel="stylesheet" href="kitchen.css">
 
-    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        // Handle order form submission via AJAX
-        $(document).on('submit', '#order-form', function(e) {
-            e.preventDefault(); // Prevent the default form submission
-
-            var room_number = $('#room_number').val();
-            var order_description = $('#order_description').val();
-
-            $.ajax({
-                url: 'kitchen.php',
-                type: 'POST',
-                data: {
-                    submit_order: true,
-                    room_number: room_number,
-                    order_description: order_description
-                },
-                success: function(response) {
-                    // Clear the form fields
-                    $('#room_number').val('');
-                    $('#order_description').val('');
-
-                    // Update the orders table dynamically
-                    fetchOrders();
-                }
-            });
-        });
-
-        // Handle marking an order as completed via AJAX
-        function markAsComplete(orderId) {
-            $.ajax({
-                url: 'kitchen.php',
-                type: 'POST',
-                data: {
-                    mark_completed: true,
-                    order_id: orderId
-                },
-                success: function(response) {
-                    // Parse the JSON response from the server
-                    var data = JSON.parse(response);
-
-                    if (data.status === 'sent to front desk') {
-                        // Update the order status in the table dynamically
-                        $('#order-status-' + orderId).text('Sent to Front Desk');
-                        $('#order-status-' + orderId).addClass('sent-to-front-desk');  // You can also add a custom CSS class if needed
-                    }
-                }
-            });
-        }
-
-        // Fetch and update the orders table dynamically
-        function fetchOrders() {
-            $.ajax({
-                url: 'fetch_orders.php', // This script returns the table rows
-                success: function(response) {
-                    $('#orders-table tbody').html(response);
-                }
-            });
-        }
-
-        // Fetch orders when the page loads
-        $(document).ready(function() {
-            fetchOrders();
-        });
-    </script>
+    <script src="kitchen.js"></script>
 </head>
 <body>
     <h1>Kitchen Orders</h1>
 
     <!-- Form for adding a new order -->
-    <form id="order-form">
+    <form id="add-order-form" method="POST">
         <div>
             <label for="room_number">Room Number:</label>
             <input type="text" name="room_number" id="room_number" required>
         </div>
         <div>
-            <label for="order_description">Order Description:</label>
-            <textarea name="order_description" id="order_description" required></textarea>
+            <label for="menu_item">Select Menu Item:</label>
+            <select name="menu_item" id="menu_item" required>
+                <?php
+                // Fetch menu items from the database (only name and price)
+                $query = "SELECT id, name, price FROM menu_items";
+                $result = $conn->query($query);
+                while ($row = $result->fetch_assoc()) {
+                    echo "<option value='" . $row['id'] . "'>" . $row['name'] . " (₦" . number_format($row['price'], 2) . ")</option>";
+                }
+                ?>
+            </select>
         </div>
-        <button type="submit" class="button">Add Order</button>
+        <div>
+            <label for="special_instructions">Special Instructions:</label>
+            <textarea name="special_instructions" id="special_instructions" placeholder="Add any specific instructions..."></textarea>
+        </div>
+        <button type="submit" name="submit_order" class="button">Add Order</button>
     </form>
 
     <hr>
@@ -175,43 +125,31 @@ $orders = fetchOrders();
                 <th>Order ID</th>
                 <th>Room Number</th>
                 <th>Order Description</th>
+                <th>Total Amount (₦)</th>
+                <th>Special Instructions</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Orders will be dynamically loaded here -->
+        <?php while ($row = $orders->fetch_assoc()): ?>
+        <tr>
+            <td><?= $row['id'] ?></td>
+            <td><?= $row['room_number'] ?></td>
+            <td><?= $row['order_description'] ?></td>
+            <td><?= number_format($row['total_amount'], 2) ?></td>
+            <td><?= htmlspecialchars($row['special_instructions']) ?></td>
+            <td id="order-status-<?= $row['id'] ?>"><?= $row['status'] ?></td>
+            <td>
+                <form method="POST" style="display:inline-block;">
+                    <input type="hidden" name="order_id" value="<?= $row['id'] ?>">
+                    <button type="submit" name="mark_completed" class="button">Mark as Completed</button>
+                </form>
+            </td>
+        </tr>
+        <?php endwhile; ?>
         </tbody>
     </table>
+
 </body>
-
-<script>// Handle marking an order as completed via AJAX
-// Handle marking an order as completed via AJAX
-function markAsComplete(orderId) {
-    $.ajax({
-        url: 'mark_order.php',  // Use the mark_order.php for updating the status
-        type: 'POST',
-        data: {
-            mark_completed: true,
-            order_id: orderId
-        },
-        success: function(response) {
-            // Parse the JSON response from the server
-            var data = JSON.parse(response);
-
-            if (data.status === 'Completed') {
-                // Update the order status in the table dynamically
-                $('#order-status-' + orderId).text('Completed');
-                $('#order-status-' + orderId).addClass('completed');  // Optional: add a custom class for styling
-            } else {
-                alert('Failed to update order status: ' + data.message);  // Handle any errors
-            }
-        },
-        error: function() {
-            alert('There was an error processing your request.');
-        }
-    });
-}
-
-</script>
 </html>

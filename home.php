@@ -114,24 +114,34 @@ if ($result->num_rows > 0) {
                 </section>
 
                 <!-- Kitchen Order Section -->
-                <section class="kitchen-order">
-                    <h2>Kitchen Order - Antilla Apartments & Suites</h2>
-                    <table id="kitchen-orders">
-                        <tr>
-                            <th><i class="fas fa-utensils"></i> Room Orders</th>
-                        </tr>
-                        <!-- Data from database will be injected here -->
-                        <?php
-                        if ($result_kitchen->num_rows > 0) {
-                            while ($order = $result_kitchen->fetch_assoc()) {
-                                echo "<tr><td>Room " . $order['room_number'] . " - " . $order['order_description'] . " (Status: " . $order['status'] . ")</td></tr>";
-                            }
-                        } else {
-                            echo "<tr><td>No kitchen orders available.</td></tr>";
-                        }
-                        ?>
-                    </table>
-                </section>
+<section class="kitchen-order">
+    <h2>Kitchen Order - Antilla Apartments & Suites</h2>
+    <table id="kitchen-orders">
+        <tr>
+            <th>Room Number</th>
+            <th>Order Description</th>
+            <th>Total Amount (₦)</th>
+            <th>Status</th>
+            <th>Special Instructions</th>
+        </tr>
+        <?php
+        if ($result_kitchen->num_rows > 0) {
+            while ($order = $result_kitchen->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . htmlspecialchars($order['room_number']) . "</td>";
+                echo "<td>" . htmlspecialchars($order['order_description']) . "</td>";
+                echo "<td>" . number_format($order['total_amount'], 2) . "</td>";
+                echo "<td>" . htmlspecialchars($order['status']) . "</td>";
+                echo "<td>" . htmlspecialchars($order['special_instructions']) . "</td>";
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='5'>No kitchen orders available.</td></tr>";
+        }
+        ?>
+    </table>
+</section>
+
 
                 <!-- Bar Order Section -->
                 <section class="bar-order">
