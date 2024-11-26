@@ -50,6 +50,7 @@ while ($row = $result->fetch_assoc()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Room Management - Antilla Apartments & Suites</title>
     <link rel="stylesheet" href="room.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="room.js" defer></script>
 </head>
 <body>
@@ -57,6 +58,9 @@ while ($row = $result->fetch_assoc()) {
         <header>
             <h1>Room Management</h1>
             <p>Manage rooms and their statuses below.</p>
+            <a href="home.php" class="button new-guest">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>Home
+            </a>
         </header>
 
         <!-- Room Filter Form -->

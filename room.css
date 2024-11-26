@@ -235,6 +235,43 @@ form button {
     background-color: #e0a800;
 }
 
+.button {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .button i {
+    margin-right: 5px;
+  }
+  
+  .button:hover {
+    background-color: #0056b3;
+  }
+  
+  .button.new-guest {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.button.new-guest:hover {
+    background-color: #0056b3;
+}
+
+
 /* Footer */
 footer {
     text-align: center;
