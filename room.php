@@ -77,15 +77,6 @@ while ($row = $result->fetch_assoc()) {
     </form>
 </section>
 
-
-        <!-- Link to Create Room Page -->
-        <section class="add-room-link">
-            <h2>Add a New Room</h2>
-            <form action="create_room.php" method="GET">
-                <button type="submit" class="button">Go to Add Room Page</button>
-            </form>
-        </section>
-
         <!-- Room Table -->
         <section class="room-list">
             <h2>Room List</h2>
@@ -151,6 +142,14 @@ while ($row = $result->fetch_assoc()) {
             </table>
         </section>
     </div>
+    
+      <!-- Link to Create Room Page -->
+      <section class="add-room-link">
+            <h2>Add a New Room</h2>
+            <form action="create_room.php" method="GET">
+                <button type="submit" class="button">Go to Add Room Page</button>
+            </form>
+        </section>
 </body>
 
 <!-- Footer Section -->

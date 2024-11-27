@@ -1,3 +1,9 @@
+
+
+
+
+
+
 // Handle order form submission via AJAX
 $(document).on('submit', '#order-form', function(e) {
     e.preventDefault(); // Prevent default form submission
@@ -36,29 +42,34 @@ $(document).on('submit', '#order-form', function(e) {
 // Handle marking an order as completed via AJAX
 function markAsComplete(orderId) {
     $.ajax({
-        url: 'kitchen.php',  // The same PHP file that handles order completion
+        url: 'kitchen.php',  // Ensure this points to your script handling the request
         type: 'POST',
         data: {
             mark_completed: true,
             order_id: orderId
         },
         success: function(response) {
-            // Parse the JSON response from the server
-            var data = JSON.parse(response);
+            try {
+                var data = JSON.parse(response); // Parse the JSON response
+                if (data.status === 'Completed') {
+                    // Dynamically update the order status
+                    $('#order-status-' + orderId).text('Completed'); 
+                    $('#order-status-' + orderId).addClass('completed'); // Optional: Add a styling class
+                    $(`#order-status-${orderId}`).prop('disabled', true);
 
-            if (data.status === 'Completed') {
-                // Update the order status in the table dynamically
-                $('#order-status-' + orderId).text('Completed'); // Update status text
-                $('#order-status-' + orderId).addClass('completed');  // Optional: add a custom class for styling
-            } else {
-                alert('Failed to update order status: ' + data.message);  // Handle any errors
+                } else {
+                    alert('Failed to update status: ' + data.message);
+                }
+            } catch (e) {
+                console.error('Error parsing response:', e);
             }
         },
         error: function() {
-            alert('There was an error processing your request.');
+            alert('Error updating order. Please try again.');
         }
     });
 }
+
 
 
 // Fetch and update the orders table dynamically
@@ -167,3 +178,5 @@ document.getElementById('add-order-form').addEventListener('submit', function (e
         alert('Error occurred. Please try again.');
     });
 });
+
+

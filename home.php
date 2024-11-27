@@ -45,13 +45,6 @@ $result = $conn->query($query);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="icon"><i class="fas fa-hotel"></i></div>
-        <div class="icon"><i class="fas fa-tasks"></i></div>
-        <div class="icon"><i class="fas fa-calendar-alt"></i></div>
-        <div class="icon"><i class="fas fa-cog"></i></div>
-    </aside>
 
     <!-- Main Content -->
     <div class="main-content">
