@@ -36,8 +36,38 @@ if (!$booking) {
     exit();
 }
 
-// Placeholder for additional charges (kitchen and bar)
-$additional_charges = 0; // We'll calculate this when integrating kitchen/bar pages
+// Calculate additional charges (kitchen and bar)
+$checkin_date = $booking['checkin_date'];
+$checkout_date = $booking['checkout_date'];
+
+// Query for kitchen charges
+$query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges
+                  FROM kitchen_orders
+                  WHERE room_number = ? 
+                  AND status = 'completed'
+                  AND DATE(timestamp) BETWEEN ? AND ?";
+$stmt_kitchen = $conn->prepare($query_kitchen);
+$stmt_kitchen->bind_param("iss", $room_number, $checkin_date, $checkout_date);
+$stmt_kitchen->execute();
+$result_kitchen = $stmt_kitchen->get_result();
+$kitchen_data = $result_kitchen->fetch_assoc();
+$kitchen_charges = $kitchen_data['kitchen_charges'];
+
+// Query for bar charges
+$query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges
+              FROM bar_orders
+              WHERE room_number = ? 
+              AND status = 'completed'
+              AND DATE(timestamp) BETWEEN ? AND ?";
+$stmt_bar = $conn->prepare($query_bar);
+$stmt_bar->bind_param("iss", $room_number, $checkin_date, $checkout_date);
+$stmt_bar->execute();
+$result_bar = $stmt_bar->get_result();
+$bar_data = $result_bar->fetch_assoc();
+$bar_charges = $bar_data['bar_charges'];
+
+// Total additional charges
+$additional_charges = $kitchen_charges + $bar_charges;
 
 // Calculate the total charges
 $current_day = date('l');
@@ -67,12 +97,17 @@ $total_charges = $room_price + $additional_charges;
         <p><strong>Check-in Date:</strong> <?php echo htmlspecialchars($booking['checkin_date']); ?></p>
         <p><strong>Check-out Date:</strong> <?php echo htmlspecialchars($booking['checkout_date']); ?></p>
         <p><strong>Room Charges:</strong> ₦<?php echo number_format($room_price, 2); ?></p>
+        <p><strong>Kitchen Charges:</strong> ₦<?php echo number_format($kitchen_charges, 2); ?></p>
+        <p><strong>Bar Charges:</strong> ₦<?php echo number_format($bar_charges, 2); ?></p>
         <p><strong>Additional Charges (Bar/Kitchen):</strong> ₦<?php echo number_format($additional_charges, 2); ?></p>
         <hr>
         <p><strong>Total Charges:</strong> ₦<?php echo number_format($total_charges, 2); ?></p>
         <p><strong>Payment Status:</strong> <?php echo htmlspecialchars($booking['payment_status']); ?></p>
         <p><strong>Payment Method:</strong> <?php echo htmlspecialchars($booking['payment_method']); ?></p>
+
         <form action="complete_checkout.php" method="POST">
+        <label for="actual_checkout_date">Actual Checkout Date:</label>
+        <input type="date" id="actual_checkout_date" name="actual_checkout_date" value="<?php echo date('Y-m-d'); ?>" required>
             <input type="hidden" name="room_number" value="<?php echo $room_number; ?>">
             <button type="submit" class="button">Complete Checkout</button>
         </form>

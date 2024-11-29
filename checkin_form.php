@@ -80,7 +80,7 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
                 <label for="checkout_date">Check-out Date:</label>
                 <input type="date" id="checkout_date" name="checkout_date" required>
 
-                <button type="submit" class="button">Complete Check-in</button>
+                <button type="submit" class="button checkin-btn">Complete Check-in</button>
             </form>
         </section>
 

@@ -19,15 +19,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Calculate total amount (since it's one item, total is the price)
     $total_amount = $price;
 
-    // Insert order into the kitchen_orders table
-    $insert_query = "INSERT INTO kitchen_orders (room_number, order_description, status, timestamp, total_amount, special_instructions) 
-                     VALUES (?, ?, 'pending', NOW(), ?, ?)";
-    $insert_stmt = $conn->prepare($insert_query);
-    $order_description = "Room " . $room_number . " - " . $name; // Use name only
-    $insert_stmt->bind_param("ssds", $room_number, $order_description, $total_amount, $special_instructions);
-    $insert_stmt->execute();
+    // Fetch the current booking's ID for the given room number
+$booking_query = "SELECT id AS booking_id FROM bookings 
+WHERE room_number = ? AND checkout_date IS NULL";
+$booking_stmt = $conn->prepare($booking_query);
+$booking_stmt->bind_param("i", $room_number);
+$booking_stmt->execute();
+$booking_result = $booking_stmt->get_result();
+$booking = $booking_result->fetch_assoc();
 
-    // Return a success response (optional)
-    echo json_encode(['success' => true]);
+if (!$booking) {
+echo json_encode(['success' => false, 'message' => 'No active booking found for the specified room.']);
+exit();
+}
+
+$booking_id = $booking['booking_id'];
+
+// Insert order into the kitchen_orders table with booking_id
+$insert_query = "INSERT INTO kitchen_orders (booking_id, room_number, order_description, status, timestamp, total_amount, special_instructions) 
+VALUES (?, ?, ?, 'pending', NOW(), ?, ?)";
+$insert_stmt = $conn->prepare($insert_query);
+$order_description = "Room " . $room_number . " - " . $name; // Use name only
+$insert_stmt->bind_param("issds", $booking_id, $room_number, $order_description, $total_amount, $special_instructions);
+$insert_stmt->execute();
+
+// Return a success response
+echo json_encode(['success' => true]);
+
 }
 ?>

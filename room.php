@@ -118,18 +118,12 @@ while ($row = $result->fetch_assoc()) {
             <button type="submit" class="button book-btn">Book Now</button>
         </form>
     <?php elseif ($room['status'] == 'Occupied'): ?>
-        <!-- Check-out and Extend Stay Buttons -->
+        <!-- Check-out Button -->
         <form action="checkout.php" method="POST">
     <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
     <button type="submit" class="button checkout-btn">Check-out</button>
 </form>
 
-<form action="extend_stay.php" method="POST">
-    <input type="hidden" name="room_number" value="<?php echo $room['room_number']; ?>">
-    <label for="new_checkout_date">New Checkout Date:</label>
-    <input type="date" name="new_checkout_date" required>
-    <button type="submit" class="button extend-btn">Extend Stay</button>
-</form>
     <?php else: ?>
         <!-- Under Maintenance Status -->
         <span class="status under-maintenance">Under Maintenance</span>
