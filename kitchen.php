@@ -82,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_completed'])) {
     }
 }
 
+
 // Fetch all orders
 function fetchOrders($conn) {
     $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp 
@@ -94,9 +95,10 @@ $orders = fetchOrders($conn);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitchen Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="kitchen.css">
 </head>
 <body>
@@ -192,110 +194,21 @@ $orders = fetchOrders($conn);
                     <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
                     <td>
                         <?php if ($order['status'] !== 'Completed'): ?>
-                            <button onclick="markAsComplete(<?= $order['id'] ?>)">Mark Completed</button>
+                            <button onclick="markAsComplete(<?= $order['id'] ?>)" id="mark-completed-btn-<?= $order['id'] ?>">Mark Completed</button>
                         <?php else: ?>
-                            Completed
+                            <button disabled>Completed</button>
                         <?php endif; ?>
+
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
-
+    
     <script>
-        const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
+    const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
+</script>
 
-document.getElementById('category').addEventListener('change', function () {
-    const categoryId = this.value;
-    const menuSelect = document.getElementById('menu_item');
-    menuSelect.innerHTML = '<option value="">-- Select Menu Item --</option>';
-
-    if (menuItemsByCategory[categoryId]) {
-        menuItemsByCategory[categoryId].forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = `${item.name} (₦${parseFloat(item.price).toFixed(2)})`;
-            menuSelect.appendChild(option);
-        });
-    }
-});
-
-const orderTray = [];
-const orderTrayTable = document.getElementById('orderTray').querySelector('tbody');
-
-// Add item to the tray
-document.getElementById('addToTray').addEventListener('click', () => {
-    const roomNumber = document.getElementById('room_number').value;
-    const menuItemId = document.getElementById('menu_item').value;
-    const menuItemText = document.getElementById('menu_item').selectedOptions[0]?.textContent || '';
-    const specialInstructions = document.getElementById('special_instructions').value;
-
-    if (!roomNumber || !menuItemId) {
-        alert('Please select a room and menu item.');
-        return;
-    }
-
-    const price = parseFloat(menuItemText.match(/\(₦([\d.]+)\)/)?.[1] || 0);
-    orderTray.push({ menuItemId, menuItemText, price, specialInstructions });
-
-    // Update table
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${menuItemText}</td>
-        <td>₦${price.toFixed(2)}</td>
-        <td>${specialInstructions}</td>
-        <td><button class="remove-item">Remove</button></td>
-    `;
-    orderTrayTable.appendChild(row);
-
-    // Remove item event
-    row.querySelector('.remove-item').addEventListener('click', () => {
-        const index = Array.from(orderTrayTable.children).indexOf(row);
-        orderTray.splice(index, 1); // Remove from array
-        row.remove(); // Remove row
-    });
-});
-
-// Submit orders
-document.getElementById('submitOrders').addEventListener('click', () => {
-    if (!orderTray.length) {
-        alert('The order tray is empty.');
-        return;
-    }
-
-    const roomNumber = document.getElementById('room_number').value;
-    fetch('submit_orders.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomNumber, orders: orderTray }),
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Orders submitted successfully!');
-                orderTray.length = 0; // Clear the tray
-                orderTrayTable.innerHTML = ''; // Clear the table
-            } else {
-                alert('Failed to submit orders.');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-});
-
-
-        function markAsComplete(orderId) {
-            fetch('kitchen.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `mark_completed=1&order_id=${orderId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'Completed') {
-                    document.getElementById(`status-${orderId}`).textContent = 'Completed';
-                }
-            });
-        }
-    </script>
+<script src="kitchen.js"></script>
 </body>
 </html>

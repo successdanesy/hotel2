@@ -1,6 +1,79 @@
+document.getElementById('category').addEventListener('change', function () {
+    const categoryId = this.value;
+    const menuSelect = document.getElementById('menu_item');
+    menuSelect.innerHTML = '<option value="">-- Select Menu Item --</option>';
 
+    if (menuItemsByCategory[categoryId]) {
+        menuItemsByCategory[categoryId].forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = `${item.name} (₦${parseFloat(item.price).toFixed(2)})`;
+            menuSelect.appendChild(option);
+        });
+    }
+});
 
+const orderTray = [];
+const orderTrayTable = document.getElementById('orderTray').querySelector('tbody');
 
+// Add item to the tray
+document.getElementById('addToTray').addEventListener('click', () => {
+    const roomNumber = document.getElementById('room_number').value;
+    const menuItemId = document.getElementById('menu_item').value;
+    const menuItemText = document.getElementById('menu_item').selectedOptions[0]?.textContent || '';
+    const specialInstructions = document.getElementById('special_instructions').value;
+
+    if (!roomNumber || !menuItemId) {
+        alert('Please select a room and menu item.');
+        return;
+    }
+
+    const price = parseFloat(menuItemText.match(/\(₦([\d.]+)\)/)?.[1] || 0);
+    orderTray.push({ menuItemId, menuItemText, price, specialInstructions });
+
+    // Update table
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${menuItemText}</td>
+        <td>₦${price.toFixed(2)}</td>
+        <td>${specialInstructions}</td>
+        <td><button class="remove-item">Remove</button></td>
+    `;
+    orderTrayTable.appendChild(row);
+
+    // Remove item event
+    row.querySelector('.remove-item').addEventListener('click', () => {
+        const index = Array.from(orderTrayTable.children).indexOf(row);
+        orderTray.splice(index, 1); // Remove from array
+        row.remove(); // Remove row
+    });
+});
+
+// Submit orders
+document.getElementById('submitOrders').addEventListener('click', () => {
+    if (!orderTray.length) {
+        alert('The order tray is empty.');
+        return;
+    }
+
+    const roomNumber = document.getElementById('room_number').value;
+    fetch('submit_orders.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomNumber, orders: orderTray }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Orders submitted successfully!');
+                orderTray.length = 0; // Clear the tray
+                orderTrayTable.innerHTML = ''; // Clear the table
+            } else {
+                alert('Failed to submit orders.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+});
 
 
 
@@ -39,36 +112,35 @@ $(document).on('submit', '#order-form', function(e) {
 });
 
 
-// Handle marking an order as completed via AJAX
 function markAsComplete(orderId) {
-    $.ajax({
-        url: 'kitchen.php',  // Ensure this points to your script handling the request
-        type: 'POST',
-        data: {
-            mark_completed: true,
-            order_id: orderId
-        },
-        success: function(response) {
-            try {
-                var data = JSON.parse(response); // Parse the JSON response
-                if (data.status === 'Completed') {
-                    // Dynamically update the order status
-                    $('#order-status-' + orderId).text('Completed'); 
-                    $('#order-status-' + orderId).addClass('completed'); // Optional: Add a styling class
-                    $(`#order-status-${orderId}`).prop('disabled', true);
+    fetch('kitchen.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `mark_completed=1&order_id=${orderId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'Completed') {
+            // Update button and status text
+            const button = document.getElementById(`mark-completed-btn-${orderId}`);
+            button.disabled = true; // Disable the button
+            button.textContent = 'Completed'; // Change button text to "Completed"
 
-                } else {
-                    alert('Failed to update status: ' + data.message);
-                }
-            } catch (e) {
-                console.error('Error parsing response:', e);
+            // Optionally update status on the page, if you have a specific element for order status
+            const statusElement = document.getElementById(`status-${orderId}`);
+            if (statusElement) {
+                statusElement.textContent = 'Completed';
             }
-        },
-        error: function() {
-            alert('Error updating order. Please try again.');
+        } else {
+            alert('Failed to mark as completed.');
         }
+    })
+    .catch(error => {
+        console.error('Error updating order:', error);
+        alert('Failed to update order status. Please try again.');
     });
 }
+
 
 
 
