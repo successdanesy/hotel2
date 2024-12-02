@@ -14,21 +14,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->begin_transaction();
 
     try {
-        // Update room status to 'Occupied'
-        $update_room_query = "UPDATE rooms SET status = 'Occupied' WHERE room_number = ?";
-        $stmt1 = $conn->prepare($update_room_query);
-        $stmt1->bind_param("s", $room_number);
+        // Insert the guest name into the guests table
+        $insert_guest_query = "INSERT INTO guests (guest_name) VALUES (?)";
+        $stmt1 = $conn->prepare($insert_guest_query);
+        $stmt1->bind_param("s", $guest_name);
         $stmt1->execute();
 
+        // Get the guest_id of the newly inserted guest
+        $guest_id = $stmt1->insert_id;
+
         // Insert booking details into the bookings table
-        $insert_booking_query = "INSERT INTO bookings (guest_name, room_number, price, payment_status, payment_method, checkin_date, checkout_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $insert_booking_query = "INSERT INTO bookings (guest_name, room_number, price, payment_status, payment_method, checkin_date, checkout_date, guest_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt2 = $conn->prepare($insert_booking_query);
-        $stmt2->bind_param("ssdssss", $guest_name, $room_number, $price, $payment_status, $payment_method, $checkin_date, $checkout_date);
+        $stmt2->bind_param("ssdssssi", $guest_name, $room_number, $price, $payment_status, $payment_method, $checkin_date, $checkout_date, $guest_id);
         $stmt2->execute();
+
+        // Store the guest_id in the session for future use (e.g., kitchen orders, bar orders)
+        $_SESSION['guest_id'] = $guest_id;
+
+        // Update room status to 'Occupied'
+        $update_room_query = "UPDATE rooms SET status = 'Occupied' WHERE room_number = ?";
+        $stmt3 = $conn->prepare($update_room_query);
+        $stmt3->bind_param("s", $room_number);
+        $stmt3->execute();
 
         // Commit transaction
         $conn->commit();
 
+        // Redirect to the room management page or another page as needed
         header('Location: room.php?message=Guest checked in successfully.');
         exit();
     } catch (Exception $e) {
