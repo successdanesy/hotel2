@@ -14,10 +14,10 @@ if (!isset($_POST['room_number'])) {
 
 $room_number = $_POST['room_number'];
 
-// Fetch guest and booking details
+// Fetch guest and booking details, including guest_name from rooms table
 $query = "SELECT 
             b.booking_id,
-            b.guest_name,
+            r.guest_name,  /* Fetch guest_name from rooms table */
             b.guest_id,  /* Ensure guest_id is fetched */
             b.checkin_date,
             b.checkout_date,
@@ -30,7 +30,6 @@ $query = "SELECT
           FROM bookings b
           INNER JOIN rooms r ON b.room_number = r.room_number
           WHERE b.room_number = ?";
-
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $room_number);
@@ -58,12 +57,19 @@ $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges
                   AND DATE(timestamp) BETWEEN ? AND ?";
 $stmt_kitchen = $conn->prepare($query_kitchen);
 $stmt_kitchen->bind_param("iss", $guest_id, $checkin_date, $checkout_date);
-$stmt_kitchen->execute();
-$result_kitchen = $stmt_kitchen->get_result();
-$kitchen_data = $result_kitchen->fetch_assoc();
-$kitchen_charges = $kitchen_data['kitchen_charges'];
 
-// Query for bar charges based on guest_id
+if ($stmt_kitchen->execute()) {
+    $result_kitchen = $stmt_kitchen->get_result();
+    $kitchen_data = $result_kitchen->fetch_assoc();
+    $kitchen_charges = $kitchen_data['kitchen_charges'];
+} else {
+    die("Error fetching kitchen charges: " . $stmt_kitchen->error);
+}
+
+// Debugging
+error_log("Kitchen Query Parameters: Guest ID: $guest_id, Checkin Date: $checkin_date, Checkout Date: $checkout_date");
+
+
 $query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges
               FROM bar_orders
               WHERE guest_id = ? 
@@ -71,10 +77,18 @@ $query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges
               AND DATE(timestamp) BETWEEN ? AND ?";
 $stmt_bar = $conn->prepare($query_bar);
 $stmt_bar->bind_param("iss", $guest_id, $checkin_date, $checkout_date);
-$stmt_bar->execute();
-$result_bar = $stmt_bar->get_result();
-$bar_data = $result_bar->fetch_assoc();
-$bar_charges = $bar_data['bar_charges'];
+
+if ($stmt_bar->execute()) {
+    $result_bar = $stmt_bar->get_result();
+    $bar_data = $result_bar->fetch_assoc();
+    $bar_charges = $bar_data['bar_charges'];
+} else {
+    die("Error fetching bar charges: " . $stmt_bar->error);
+}
+
+// Debugging
+error_log("Bar Query Parameters: Guest ID: $guest_id, Checkin Date: $checkin_date, Checkout Date: $checkout_date");
+
 
 // Total additional charges
 $additional_charges = $kitchen_charges + $bar_charges;

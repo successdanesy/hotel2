@@ -32,10 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Store the guest_id in the session for future use (e.g., kitchen orders, bar orders)
         $_SESSION['guest_id'] = $guest_id;
 
-        // Update the room status to 'Occupied' and assign guest_id to the room
-        $update_room_query = "UPDATE rooms SET status = 'Occupied', guest_id = ? WHERE room_number = ?";
+        // Update the room status to 'Occupied', assign guest_id and guest_name to the room
+        $update_room_query = "UPDATE rooms SET status = 'Occupied', guest_id = ?, guest_name = ? WHERE room_number = ?";
         $stmt3 = $conn->prepare($update_room_query);
-        $stmt3->bind_param("ii", $guest_id, $room_number);
+        $stmt3->bind_param("isi", $guest_id, $guest_name, $room_number);
         $stmt3->execute();
 
         // Also update related tables with the same guest_id
