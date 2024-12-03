@@ -38,6 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt3->bind_param("s", $room_number);
         $stmt3->execute();
 
+        //update bookings
+        // Assuming you have $guest_name and $guest_id from the form or session
+        $update_booking_query = "UPDATE bookings SET guest_name = ?, guest_id = ? WHERE booking_id = ?";
+        $stmt = $conn->prepare($update_booking_query);
+        $stmt->bind_param("ssi", $guest_name, $guest_id, $booking_id);
+        $stmt->execute();
+
+
         // Commit transaction
         $conn->commit();
 

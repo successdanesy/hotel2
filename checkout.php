@@ -2,6 +2,10 @@
 session_start();
 include('db_connect.php');
 
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 // Redirect if no room number is provided
 if (!isset($_POST['room_number'])) {
     header('Location: room.php?error=Room number is required for checkout.');
@@ -12,7 +16,9 @@ $room_number = $_POST['room_number'];
 
 // Fetch guest and booking details
 $query = "SELECT 
+            b.booking_id,
             b.guest_name,
+            b.guest_id,  /* Ensure guest_id is fetched */
             b.checkin_date,
             b.checkout_date,
             b.payment_status,
@@ -24,6 +30,8 @@ $query = "SELECT
           FROM bookings b
           INNER JOIN rooms r ON b.room_number = r.room_number
           WHERE b.room_number = ?";
+
+
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $room_number);
 $stmt->execute();
@@ -36,31 +44,33 @@ if (!$booking) {
     exit();
 }
 
+$guest_id = $booking['guest_id'];  // Fetch the guest_id from the booking
+
 // Calculate additional charges (kitchen and bar)
 $checkin_date = $booking['checkin_date'];
 $checkout_date = $booking['checkout_date'];
 
-// Query for kitchen charges
+// Query for kitchen charges based on guest_id
 $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges
                   FROM kitchen_orders
-                  WHERE room_number = ? 
+                  WHERE guest_id = ? 
                   AND status = 'completed'
                   AND DATE(timestamp) BETWEEN ? AND ?";
 $stmt_kitchen = $conn->prepare($query_kitchen);
-$stmt_kitchen->bind_param("iss", $room_number, $checkin_date, $checkout_date);
+$stmt_kitchen->bind_param("iss", $guest_id, $checkin_date, $checkout_date);
 $stmt_kitchen->execute();
 $result_kitchen = $stmt_kitchen->get_result();
 $kitchen_data = $result_kitchen->fetch_assoc();
 $kitchen_charges = $kitchen_data['kitchen_charges'];
 
-// Query for bar charges
+// Query for bar charges based on guest_id
 $query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges
               FROM bar_orders
-              WHERE room_number = ? 
+              WHERE guest_id = ? 
               AND status = 'completed'
               AND DATE(timestamp) BETWEEN ? AND ?";
 $stmt_bar = $conn->prepare($query_bar);
-$stmt_bar->bind_param("iss", $room_number, $checkin_date, $checkout_date);
+$stmt_bar->bind_param("iss", $guest_id, $checkin_date, $checkout_date);
 $stmt_bar->execute();
 $result_bar = $stmt_bar->get_result();
 $bar_data = $result_bar->fetch_assoc();
@@ -106,8 +116,8 @@ $total_charges = $room_price + $additional_charges;
         <p><strong>Payment Method:</strong> <?php echo htmlspecialchars($booking['payment_method']); ?></p>
 
         <form action="complete_checkout.php" method="POST">
-        <label for="actual_checkout_date">Actual Checkout Date:</label>
-        <input type="date" id="actual_checkout_date" name="actual_checkout_date" value="<?php echo date('Y-m-d'); ?>" required>
+            <label for="actual_checkout_date">Actual Checkout Date:</label>
+            <input type="date" id="actual_checkout_date" name="actual_checkout_date" value="<?php echo date('Y-m-d'); ?>" required>
             <input type="hidden" name="room_number" value="<?php echo $room_number; ?>">
             <button type="submit" class="button">Complete Checkout</button>
         </form>

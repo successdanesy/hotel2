@@ -24,7 +24,7 @@ $payment_status = isset($_GET['payment_status']) && $_GET['payment_status'] ? $c
 
 // Simplified SQL query with subqueries to avoid GROUP BY issues
 $query = "
-    SELECT b.booking_id, b.guest_name, b.room_number, b.checkin_date, b.checkout_date, b.payment_status,
+    SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status,
            r.weekday_price, r.weekend_price,
            (SELECT IFNULL(SUM(k.total_amount), 0) FROM kitchen_orders k WHERE k.room_number = b.room_number) AS kitchen_order_total,
            (SELECT IFNULL(SUM(bar.total_amount), 0) FROM bar_orders bar WHERE bar.room_number = b.room_number) AS bar_order_total,
@@ -37,6 +37,7 @@ $query = "
     WHERE (b.guest_name LIKE ? OR b.room_number LIKE ?)
       AND b.payment_status LIKE ?
     ORDER BY b.checkin_date DESC";
+
 
 $stmt = $conn->prepare($query);
 if (!$stmt) {
@@ -89,11 +90,13 @@ while ($row = $result->fetch_assoc()) {
         </form>
 
         <!-- Guest Table -->
-        <section class="guest-list">
+        <!-- Guest Table -->
+<section class="guest-list">
     <h2>Guest List</h2>
     <table>
         <thead>
             <tr>
+                <th>Guest ID</th> <!-- New Column for Guest ID -->
                 <th>Guest Name</th>
                 <th>Room Number</th>
                 <th>Room Price</th> <!-- Room Price Column -->
@@ -108,7 +111,9 @@ while ($row = $result->fetch_assoc()) {
         <tbody>
             <?php foreach ($guests as $guest): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($guest['guest_name']); ?></td>
+                <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
+                <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
+
                     <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
                     <td>₦<?php 
                         // Determine if the date range is during the weekend (Friday-Sunday)
@@ -143,7 +148,6 @@ while ($row = $result->fetch_assoc()) {
         </tbody>
     </table>
 </section>
-
 
     </div>
 
