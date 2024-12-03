@@ -1,5 +1,37 @@
+function fetchGuestId() {
+    const roomNumber = document.getElementById('room_number').value;
+
+    if (!roomNumber) {
+        alert("Please select a room number.");
+        return;
+    }
+
+    fetch(`get_guest_id_by_room.php?room_number=${roomNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('guest_id').value = data.guest_id;
+                document.getElementById('status').innerText = 'Guest ID found: ' + data.guest_id;
+            } else {
+                document.getElementById('guest_id').value = '';
+                document.getElementById('status').innerText = 'Error: ' + data.error;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching guest ID:', error);
+            document.getElementById('status').innerText = 'An error occurred.';
+        });
+}
+
+
+
+// Update menu items based on category selection
 document.getElementById('category').addEventListener('change', function () {
     const categoryId = this.value;
+    updateMenuItems(categoryId);
+});
+
+function updateMenuItems(categoryId) {
     const menuSelect = document.getElementById('menu_item');
     menuSelect.innerHTML = '<option value="">-- Select Menu Item --</option>';
 
@@ -11,8 +43,9 @@ document.getElementById('category').addEventListener('change', function () {
             menuSelect.appendChild(option);
         });
     }
-});
+}
 
+// Order Tray Logic
 const orderTray = [];
 const orderTrayTable = document.getElementById('orderTray').querySelector('tbody');
 
@@ -29,9 +62,12 @@ document.getElementById('addToTray').addEventListener('click', () => {
     }
 
     const price = parseFloat(menuItemText.match(/\(₦([\d.]+)\)/)?.[1] || 0);
-    orderTray.push({ menuItemId, menuItemText, price, specialInstructions });
+    addItemToTray(menuItemId, menuItemText, price, specialInstructions);
+});
 
-    // Update table
+// Add item to tray and update the table
+function addItemToTray(menuItemId, menuItemText, price, specialInstructions) {
+    orderTray.push({ menuItemId, menuItemText, price, specialInstructions });
     const row = document.createElement('tr');
     row.innerHTML = `
         <td>${menuItemText}</td>
@@ -41,77 +77,61 @@ document.getElementById('addToTray').addEventListener('click', () => {
     `;
     orderTrayTable.appendChild(row);
 
-    // Remove item event
+    // Remove item from tray
     row.querySelector('.remove-item').addEventListener('click', () => {
-        const index = Array.from(orderTrayTable.children).indexOf(row);
-        orderTray.splice(index, 1); // Remove from array
-        row.remove(); // Remove row
+        orderTray.splice(Array.from(orderTrayTable.children).indexOf(row), 1);
+        row.remove();
     });
-});
+}
 
-// Submit orders
+// Submit Orders
 document.getElementById('submitOrders').addEventListener('click', () => {
     if (!orderTray.length) {
         alert('The order tray is empty.');
         return;
     }
 
+    const guestId = document.getElementById('guest_id').value;
     const roomNumber = document.getElementById('room_number').value;
+
+    if (!guestId || !roomNumber) {
+        alert('Please ensure both guest ID and room number are selected.');
+        return;
+    }
+
+    const orderData = {
+        roomNumber,
+        guestId,
+        orders: orderTray,
+        specialInstructions: document.getElementById('special_instructions').value
+    };
+
+    sendOrderToServer(orderData);
+});
+
+function sendOrderToServer(orderData) {
     fetch('submit_orders.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomNumber, orders: orderTray }),
+        body: JSON.stringify(orderData)
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Orders submitted successfully!');
-                orderTray.length = 0; // Clear the tray
-                orderTrayTable.innerHTML = ''; // Clear the table
-            } else {
-                alert('Failed to submit orders.');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-});
-
-
-
-// Handle order form submission via AJAX
-$(document).on('submit', '#order-form', function(e) {
-    e.preventDefault(); // Prevent default form submission
-
-    // Gather all form data
-    var room_number = $('#room_number').val();
-    var order_description = $('#order_description').val();
-    var total_amount = $('#total_amount').val();
-    var special_instructions = $('#special_instructions').val();
-
-    // Submit data via AJAX
-    $.ajax({
-        url: 'kitchen.php',
-        type: 'POST',
-        data: {
-            submit_order: true,
-            room_number: room_number,
-            order_description: order_description,
-            total_amount: total_amount,
-            special_instructions: special_instructions
-        },
-        success: function(response) {
-            // Clear the form fields
-            $('#order-form')[0].reset();
-
-            // Refresh the orders table
-            fetchOrders();
-        },
-        error: function() {
-            alert('Failed to submit the order. Please try again.');
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Order submitted successfully!');
+            orderTray.length = 0;
+            orderTrayTable.innerHTML = ''; // Clear the table
+        } else {
+            alert('Error: ' + data.error);
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
     });
-});
+}
 
-
+// Mark Order as Completed
 function markAsComplete(orderId) {
     fetch('kitchen.php', {
         method: 'POST',
@@ -121,16 +141,12 @@ function markAsComplete(orderId) {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'Completed') {
-            // Update button and status text
             const button = document.getElementById(`mark-completed-btn-${orderId}`);
-            button.disabled = true; // Disable the button
-            button.textContent = 'Completed'; // Change button text to "Completed"
+            button.disabled = true;
+            button.textContent = 'Completed';
 
-            // Optionally update status on the page, if you have a specific element for order status
             const statusElement = document.getElementById(`status-${orderId}`);
-            if (statusElement) {
-                statusElement.textContent = 'Completed';
-            }
+            if (statusElement) statusElement.textContent = 'Completed';
         } else {
             alert('Failed to mark as completed.');
         }
@@ -141,41 +157,31 @@ function markAsComplete(orderId) {
     });
 }
 
-
-
-
-// Fetch and update the orders table dynamically
+// Fetch Orders
 function fetchOrders() {
     $.ajax({
-        url: 'fetch_orders.php', // This script returns the table rows
+        url: 'fetch_orders.php',
         success: function(response) {
             $('#orders-table tbody').html(response);
         }
     });
 }
 
-// Fetch orders when the page loads
-$(document).ready(function() {
-    fetchOrders();
-});
-
-
-let orders = []; // Store the orders
+// Order Summary Logic
+let orders = [];
 let totalAmount = 0;
 
-// Function to add an order to the list
-function addOrder(item, price) {
+function addOrderToSummary(item, price) {
     orders.push({ item, price });
     totalAmount += price;
     updateOrderSummary();
 }
 
-// Function to update the order summary display
 function updateOrderSummary() {
     const orderList = document.getElementById('orderList');
     const totalAmountElem = document.getElementById('totalAmount');
 
-    orderList.innerHTML = ''; // Clear current list
+    orderList.innerHTML = '';
     orders.forEach(order => {
         const li = document.createElement('li');
         li.textContent = `${order.item} - ₦${order.price}`;
@@ -185,33 +191,43 @@ function updateOrderSummary() {
     totalAmountElem.textContent = totalAmount.toFixed(2);
 }
 
-// Function to clear all orders
+// Clear All Orders
 function clearAllOrders() {
     orders = [];
     totalAmount = 0;
     updateOrderSummary();
 }
 
-document.getElementById('clearAllOrdersButton').addEventListener('click', clearAllOrders);
 
 
+function loadDynamicContent() {
+    // Your dynamic content loading logic here
+    // After content is loaded, attach the event listener:
+
+    const clearButton = document.getElementById('clearAllOrdersButton');
+    if (clearButton) {
+        clearButton.addEventListener('click', clearAllOrders);
+    }
+}
+// Call this function after the content is dynamically added
+loadDynamicContent();
+
+//old code
+// document.getElementById('clearAllOrdersButton').addEventListener('click', clearAllOrders);
+
+
+
+
+// Confirm Order and Send to Front Desk
 function confirmOrder() {
     const roomNumber = document.getElementById('roomNumber').value;
     const specialInstructions = document.getElementById('specialInstructions').value;
 
-    const data = {
-        roomNumber,
-        orders,
-        totalAmount,
-        specialInstructions
-    };
+    const data = { roomNumber, orders, totalAmount, specialInstructions };
 
-    // Send data to the server
     fetch('send_to_frontdesk.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
     .then(response => response.json())
@@ -226,29 +242,36 @@ function confirmOrder() {
     .catch(error => console.error('Error:', error));
 }
 
-document.getElementById('add-order-form').addEventListener('submit', function (e) {
-    e.preventDefault(); // Prevent page reload on form submission
-    
-    let formData = new FormData(this); // Collect form data
+function loadDynamicContent() {
+    // Your dynamic content loading logic here
+    // After the form is added dynamically, attach the event listener:
 
-    fetch('add_order.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Order added successfully!');
-            // Optionally, update the table or clear the form
-            location.reload(); // Reload the page to show the updated orders
-        } else {
-            alert('Failed to add order. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error occurred. Please try again.');
-    });
-});
+    const addOrderForm = document.getElementById('add-order-form');
+    if (addOrderForm) {
+        addOrderForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            let formData = new FormData(this);
 
+            fetch('add_order.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Order added successfully!');
+                    location.reload();
+                } else {
+                    alert('Failed to add order. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error occurred. Please try again.');
+            });
+        });
+    }
+}
 
+// Call this function after the content is dynamically added
+loadDynamicContent();

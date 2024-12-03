@@ -2,6 +2,7 @@
 session_start();
 include('db_connect.php'); // Database connection
 
+
 // Fetch categories and menu items
 $queryCategories = "SELECT id, category_name FROM categories ORDER BY category_name";
 $queryMenuItems = "SELECT id, name, price, category_id FROM menu_items";
@@ -100,6 +101,7 @@ $orders = fetchOrders($conn);
     <title>Kitchen Orders</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="kitchen.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <div class="main-content">
@@ -122,11 +124,18 @@ $orders = fetchOrders($conn);
             $roomsQuery = "SELECT id, room_number FROM rooms WHERE status = 'Occupied'";
             $roomsResult = $conn->query($roomsQuery);
             while ($room = $roomsResult->fetch_assoc()) {
-                echo "<option value='{$room['id']}'>{$room['room_number']}</option>";
+                echo "<option value='{$room['room_number']}'>{$room['room_number']}</option>";
             }
             ?>
         </select>
-    </div>
+        </div>
+        <div id="guest-id-lookup">
+    <label for="guest_id">Guest ID:</label>
+    <input type="text" id="guest_id" readonly>
+    <button type="button" onclick="fetchGuestId()">Fetch Guest ID</button>
+    <p id="status"></p>
+</div>
+
 
     <!-- Menu Selection -->
     <div>

@@ -258,3 +258,18 @@ table tbody td#status-Pending {
     color: #ff9800;
     font-weight: bold;
 }
+
+#guest-id-lookup {
+    margin-top: 10px;
+}
+
+#guest-id-lookup label {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+#guest-id-lookup input {
+    width: 150px;
+    margin-right: 5px;
+}
+

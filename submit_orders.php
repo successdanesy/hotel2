@@ -1,39 +1,34 @@
 <?php
-include('db_connect.php');
+session_start();
+include('db_connect.php'); // Database connection
 
-$data = json_decode(file_get_contents('php://input'), true);
-$roomNumberId = $data['roomNumber'];
-$orders = $data['orders'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $roomNumber = $data['roomNumber'];
+    $guestId = $data['guestId'];
+    $orders = $data['orders'];
+    $specialInstructions = $data['specialInstructions'];
 
-if (!$roomNumberId || empty($orders)) {
-    echo json_encode(['success' => false, 'error' => 'Invalid input']);
-    exit;
-}
+    // Process each order in the tray
+    foreach ($orders as $order) {
+        $menuItemId = $order['menuItemId'];
+        $menuItemText = $order['menuItemText'];
+        $price = $order['price'];
 
-// Fetch room number
-$roomQuery = "SELECT room_number FROM rooms WHERE id = ?";
-$stmt = $conn->prepare($roomQuery);
-$stmt->bind_param("i", $roomNumberId);
-$stmt->execute();
-$stmt->bind_result($roomNumber);
-$stmt->fetch();
-$stmt->close();
-
-if (!$roomNumber) {
-    echo json_encode(['success' => false, 'error' => 'Invalid room']);
-    exit;
-}
-
-// Batch insert orders
-$query = "INSERT INTO kitchen_orders (room_number, order_description, status, timestamp, total_amount, special_instructions) 
-          VALUES (?, ?, 'Pending', NOW(), ?, ?)";
+        // Insert into kitchen_orders
+        $query = "INSERT INTO kitchen_orders (room_number, order_description, status, timestamp, total_amount, special_instructions, guest_id) 
+        VALUES (?, ?, 'Pending', NOW(), ?, ?, ?)";
 $stmt = $conn->prepare($query);
+$stmt->bind_param('ssdsd', $roomNumber, $menuItemText, $price, $specialInstructions, $guestId);
 
-foreach ($orders as $order) {
-    $stmt->bind_param("ssds", $roomNumber, $order['menuItemText'], $order['price'], $order['specialInstructions']);
-    $stmt->execute();
+
+        if (!$stmt->execute()) {
+            echo json_encode(['success' => false, 'error' => 'Failed to add the order.']);
+            exit();
+        }
+        $stmt->close();
+    }
+
+    echo json_encode(['success' => true, 'message' => 'Orders submitted successfully!']);
 }
-
-$stmt->close();
-echo json_encode(['success' => true]);
 ?>
