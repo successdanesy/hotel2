@@ -32,19 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Store the guest_id in the session for future use (e.g., kitchen orders, bar orders)
         $_SESSION['guest_id'] = $guest_id;
 
-        // Update room status to 'Occupied'
-        $update_room_query = "UPDATE rooms SET status = 'Occupied' WHERE room_number = ?";
+        // Update the room status to 'Occupied' and assign guest_id to the room
+        $update_room_query = "UPDATE rooms SET status = 'Occupied', guest_id = ? WHERE room_number = ?";
         $stmt3 = $conn->prepare($update_room_query);
-        $stmt3->bind_param("s", $room_number);
+        $stmt3->bind_param("ii", $guest_id, $room_number);
         $stmt3->execute();
 
-        //update bookings
-        // Assuming you have $guest_name and $guest_id from the form or session
-        $update_booking_query = "UPDATE bookings SET guest_name = ?, guest_id = ? WHERE booking_id = ?";
-        $stmt = $conn->prepare($update_booking_query);
-        $stmt->bind_param("ssi", $guest_name, $guest_id, $booking_id);
-        $stmt->execute();
+        // Also update related tables with the same guest_id
+        // For kitchen orders (example)
+        $update_kitchen_orders_query = "UPDATE kitchen_orders SET guest_id = ? WHERE room_number = ?";
+        $stmt4 = $conn->prepare($update_kitchen_orders_query);
+        $stmt4->bind_param("ii", $guest_id, $room_number);
+        $stmt4->execute();
 
+        // For bar orders (example)
+        $update_bar_orders_query = "UPDATE bar_orders SET guest_id = ? WHERE room_number = ?";
+        $stmt5 = $conn->prepare($update_bar_orders_query);
+        $stmt5->bind_param("ii", $guest_id, $room_number);
+        $stmt5->execute();
 
         // Commit transaction
         $conn->commit();

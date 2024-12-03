@@ -10,9 +10,13 @@ function fetchGuestId() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Set the guest_id in a form input field
                 document.getElementById('guest_id').value = data.guest_id;
+
+                // Update the status message on the page
                 document.getElementById('status').innerText = 'Guest ID found: ' + data.guest_id;
             } else {
+                // If there's an error, clear the guest_id field and show the error message
                 document.getElementById('guest_id').value = '';
                 document.getElementById('status').innerText = 'Error: ' + data.error;
             }
@@ -22,6 +26,7 @@ function fetchGuestId() {
             document.getElementById('status').innerText = 'An error occurred.';
         });
 }
+
 
 
 
