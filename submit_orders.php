@@ -22,6 +22,8 @@ $stmt = $conn->prepare($query);
 $stmt->bind_param('ssdsd', $roomNumber, $menuItemText, $price, $specialInstructions, $guestId);
 
 
+
+
         if (!$stmt->execute()) {
             echo json_encode(['success' => false, 'error' => 'Failed to add the order.']);
             exit();

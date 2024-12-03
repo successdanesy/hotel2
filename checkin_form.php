@@ -75,7 +75,7 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
                 </select>
 
                 <label for="checkin_date">Check-in Date:</label>
-                <input type="date" id="checkin_date" name="checkin_date" value="<?php echo date('Y-m-d'); ?>" readonly>
+                <input type="date" id="checkin_date" name="checkin_date" required>
 
                 <label for="checkout_date">Check-out Date:</label>
                 <input type="date" id="checkout_date" name="checkout_date" required>
