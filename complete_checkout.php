@@ -19,32 +19,25 @@ if (empty($actual_checkout_date)) {
     die("Error: Actual checkout date cannot be empty.");
 }
 
-// Fetch the booking details for validation
-$query_booking = "SELECT booking_id, guest_id, checkin_date FROM bookings WHERE room_number = ?";
-$stmt_booking = $conn->prepare($query_booking);
-$stmt_booking->bind_param("i", $room_number);
-$stmt_booking->execute();
-$result_booking = $stmt_booking->get_result();
+// Fetch current guest details from rooms table using guest_id
+$query_room = "SELECT guest_id, guest_name FROM rooms WHERE room_number = ?";
+$stmt_room = $conn->prepare($query_room);
+$stmt_room->bind_param("i", $room_number);
+$stmt_room->execute();
+$result_room = $stmt_room->get_result();
 
-if ($result_booking->num_rows > 0) {
-    $booking = $result_booking->fetch_assoc();
-    $booking_id = $booking['booking_id'];
-    $guest_id = $booking['guest_id'];
-    $checkin_date = $booking['checkin_date'];
+if ($result_room->num_rows > 0) {
+    $room = $result_room->fetch_assoc();
+    $guest_id = $room['guest_id'];
+    $guest_name = $room['guest_name'];
 
-    // Ensure `actual_checkout_date` is not earlier than `checkin_date`
-    if ($actual_checkout_date < $checkin_date) {
-        die("Error: Actual checkout date cannot be earlier than the check-in date.");
-    }
-
-    // Update the bookings table with the actual checkout date
-    $update_booking_query = "UPDATE bookings SET checkout_date = ? WHERE booking_id = ?";
+    // Update the guest's checkout date in the bookings table
+    $update_booking_query = "UPDATE bookings SET checkout_date = ? WHERE guest_id = ?";
     $stmt_update_booking = $conn->prepare($update_booking_query);
-    $stmt_update_booking->bind_param("si", $actual_checkout_date, $booking_id);
+    $stmt_update_booking->bind_param("si", $actual_checkout_date, $guest_id);
 
     if ($stmt_update_booking->execute()) {
-        // Even if no rows are affected, proceed with updating the room
-        // Update the room status to 'Available' and reset guest_id and guest_name
+        // Update the room status and clear guest details
         $update_room_query = "UPDATE rooms SET status = 'Available', guest_id = NULL, guest_name = NULL WHERE room_number = ?";
         $stmt_update_room = $conn->prepare($update_room_query);
         $stmt_update_room->bind_param("i", $room_number);
@@ -59,7 +52,7 @@ if ($result_booking->num_rows > 0) {
         die("Error updating checkout date: " . $stmt_update_booking->error);
     }
 } else {
-    die("Error: No booking found for the given room number.");
+    die("Error: No current guest found for the room.");
 }
 
 exit();

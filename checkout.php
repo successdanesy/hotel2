@@ -14,11 +14,11 @@ if (!isset($_POST['room_number'])) {
 
 $room_number = $_POST['room_number'];
 
-// Fetch guest and booking details, including guest_name from rooms table
+// Fetch guest details from the rooms and bookings tables (ensure we are using the current guest_id)
 $query = "SELECT 
             b.booking_id,
-            r.guest_name,  /* Fetch guest_name from rooms table */
-            b.guest_id,  /* Ensure guest_id is fetched */
+            r.guest_name,
+            r.guest_id,
             b.checkin_date,
             b.checkout_date,
             b.payment_status,
@@ -29,25 +29,26 @@ $query = "SELECT
             r.weekend_price
           FROM bookings b
           INNER JOIN rooms r ON b.room_number = r.room_number
-          WHERE b.room_number = ?";
+          WHERE b.guest_id = r.guest_id AND r.room_number = ?";
+
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $room_number);
 $stmt->execute();
 $result = $stmt->get_result();
-$booking = $result->fetch_assoc();
+$room_data = $result->fetch_assoc();
 
-// Handle missing booking
-if (!$booking) {
-    header('Location: room.php?error=No booking found for the selected room.');
+// Handle missing room data
+if (!$room_data) {
+    header('Location: room.php?error=No room found for the selected room number.');
     exit();
 }
 
-$guest_id = $booking['guest_id'];  // Fetch the guest_id from the booking
-
-// Calculate additional charges (kitchen and bar)
-$checkin_date = $booking['checkin_date'];
-$checkout_date = $booking['checkout_date'];
+// Get current guest's details from the rooms and bookings table
+$guest_id = $room_data['guest_id'];
+$guest_name = $room_data['guest_name'];
+$checkin_date = $room_data['checkin_date'];
+$checkout_date = $room_data['checkout_date'];
 
 // Query for kitchen charges based on guest_id
 $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges
@@ -69,7 +70,6 @@ if ($stmt_kitchen->execute()) {
 // Debugging
 error_log("Kitchen Query Parameters: Guest ID: $guest_id, Checkin Date: $checkin_date, Checkout Date: $checkout_date");
 
-
 $query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges
               FROM bar_orders
               WHERE guest_id = ? 
@@ -89,15 +89,14 @@ if ($stmt_bar->execute()) {
 // Debugging
 error_log("Bar Query Parameters: Guest ID: $guest_id, Checkin Date: $checkin_date, Checkout Date: $checkout_date");
 
-
 // Total additional charges
 $additional_charges = $kitchen_charges + $bar_charges;
 
-// Calculate the total charges
+// Calculate the total charges based on the current day (weekday or weekend)
 $current_day = date('l');
 $room_price = ($current_day == 'Friday' || $current_day == 'Saturday' || $current_day == 'Sunday') 
-    ? $booking['weekend_price'] 
-    : $booking['weekday_price'];
+    ? $room_data['weekend_price'] 
+    : $room_data['weekday_price'];
 
 $total_charges = $room_price + $additional_charges;
 
@@ -114,20 +113,18 @@ $total_charges = $room_price + $additional_charges;
 </head>
 <body>
     <div class="receipt-container">
-        <h1>Receipt</h1>
-        <p><strong>Guest Name:</strong> <?php echo htmlspecialchars($booking['guest_name']); ?></p>
+        <h1>Antilla Apartment & Suits Receipt</h1>
+        <p><strong>Guest Name:</strong> <?php echo htmlspecialchars($guest_name); ?></p>
         <p><strong>Room Number:</strong> <?php echo $room_number; ?></p>
-        <p><strong>Room Type:</strong> <?php echo htmlspecialchars($booking['room_type']); ?></p>
-        <p><strong>Check-in Date:</strong> <?php echo htmlspecialchars($booking['checkin_date']); ?></p>
-        <p><strong>Check-out Date:</strong> <?php echo htmlspecialchars($booking['checkout_date']); ?></p>
+        <p><strong>Room Type:</strong> <?php echo htmlspecialchars($room_data['room_type']); ?></p>
+        <p><strong>Check-in Date:</strong> <?php echo htmlspecialchars($checkin_date); ?></p>
+        <p><strong>Check-out Date:</strong> <?php echo htmlspecialchars($checkout_date); ?></p>
         <p><strong>Room Charges:</strong> ₦<?php echo number_format($room_price, 2); ?></p>
         <p><strong>Kitchen Charges:</strong> ₦<?php echo number_format($kitchen_charges, 2); ?></p>
         <p><strong>Bar Charges:</strong> ₦<?php echo number_format($bar_charges, 2); ?></p>
         <p><strong>Additional Charges (Bar/Kitchen):</strong> ₦<?php echo number_format($additional_charges, 2); ?></p>
         <hr>
         <p><strong>Total Charges:</strong> ₦<?php echo number_format($total_charges, 2); ?></p>
-        <p><strong>Payment Status:</strong> <?php echo htmlspecialchars($booking['payment_status']); ?></p>
-        <p><strong>Payment Method:</strong> <?php echo htmlspecialchars($booking['payment_method']); ?></p>
 
         <form action="complete_checkout.php" method="POST">
             <label for="actual_checkout_date">Actual Checkout Date:</label>
@@ -135,6 +132,7 @@ $total_charges = $room_price + $additional_charges;
             <input type="hidden" name="room_number" value="<?php echo $room_number; ?>">
             <button type="submit" class="button">Complete Checkout</button>
         </form>
+        <h1>Thank You For Your Patronage</h1>
     </div>
 </body>
 </html>

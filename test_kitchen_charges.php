@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Test Input: Specify a guest_id for testing
-$test_guest_id = 28; // Replace this with a valid guest_id from your database
+$test_guest_id = 35; // Replace this with a valid guest_id from your database
 
 // Define the query for kitchen charges
 $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges

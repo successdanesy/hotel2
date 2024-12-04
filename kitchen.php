@@ -25,16 +25,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_order'])) {
     $roomNumberId = $_POST['room_number'] ?? null;
     $menuItemId = $_POST['menu_item'] ?? null;
     $specialInstructions = $_POST['special_instructions'] ?? '';
+}
 
     if ($roomNumberId && $menuItemId) {
         // Get room number
-        $roomQuery = "SELECT room_number FROM rooms WHERE id = ?";
+        // Example of fetching guest_id from the rooms table
+        $roomQuery = "SELECT room_number, guest_id FROM rooms WHERE id = ?";
         $stmt = $conn->prepare($roomQuery);
         $stmt->bind_param("i", $roomNumberId);
         $stmt->execute();
-        $stmt->bind_result($roomNumber);
+        $stmt->bind_result($roomNumber, $guestId);
         $stmt->fetch();
         $stmt->close();
+        }
 
         // Get menu item details
         $menuQuery = "SELECT name, price FROM menu_items WHERE id = ?";
@@ -45,12 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_order'])) {
         $stmt->fetch();
         $stmt->close();
 
-        if ($roomNumber && $itemName && $itemPrice) {
-            $orderQuery = "INSERT INTO kitchen_orders (room_number, order_description, status, timestamp, total_amount, special_instructions) 
-                           VALUES (?, ?, 'Pending', NOW(), ?, ?)";
+        if ($roomNumber && $itemName && $itemPrice && $guestId) { // Ensure $guestId is also checked
+            $orderQuery = "INSERT INTO kitchen_orders 
+                           (room_number, order_description, status, timestamp, total_amount, special_instructions, guest_id) 
+                           VALUES (?, ?, 'Pending', NOW(), ?, ?, ?)";
             $stmt = $conn->prepare($orderQuery);
-            $stmt->bind_param("ssds", $roomNumber, $itemName, $itemPrice, $specialInstructions);
-
+            $stmt->bind_param("ssdsd", $roomNumber, $itemName, $itemPrice, $specialInstructions, $guestId);
+        
             if ($stmt->execute()) {
                 header("Location: kitchen.php");
                 exit();
@@ -59,12 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_order'])) {
             }
             $stmt->close();
         } else {
-            $error = "Invalid room or menu item.";
+            $error = "Invalid room, menu item, or missing guest information.";
         }
-    } else {
-        $error = "Please fill in all required fields.";
-    }
-}
+        
 
 // Handle marking an order as completed
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_completed'])) {
