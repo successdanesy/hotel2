@@ -26,8 +26,12 @@ $payment_status = isset($_GET['payment_status']) && $_GET['payment_status'] ? $c
 $query = "
     SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status,
            r.weekday_price, r.weekend_price,
-           (SELECT IFNULL(SUM(k.total_amount), 0) FROM kitchen_orders k WHERE k.room_number = b.room_number) AS kitchen_order_total,
-           (SELECT IFNULL(SUM(bar.total_amount), 0) FROM bar_orders bar WHERE bar.room_number = b.room_number) AS bar_order_total,
+           (SELECT IFNULL(SUM(k.total_amount), 0) 
+            FROM kitchen_orders k 
+            WHERE k.room_number = b.room_number AND k.guest_id = b.guest_id) AS kitchen_order_total,
+           (SELECT IFNULL(SUM(bar.total_amount), 0) 
+            FROM bar_orders bar 
+            WHERE bar.room_number = b.room_number AND bar.guest_id = b.guest_id) AS bar_order_total,
            CASE 
                WHEN CURRENT_DATE BETWEEN b.checkin_date AND b.checkout_date THEN 'Checked In'
                ELSE 'Checked Out'
@@ -37,6 +41,7 @@ $query = "
     WHERE (b.guest_name LIKE ? OR b.room_number LIKE ?)
       AND b.payment_status LIKE ?
     ORDER BY b.checkin_date DESC";
+
 
 
 $stmt = $conn->prepare($query);
@@ -111,30 +116,30 @@ while ($row = $result->fetch_assoc()) {
         <tbody>
             <?php foreach ($guests as $guest): ?>
                 <tr>
-                <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
                 <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
+                <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
 
                     <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
                     <td>₦<?php 
-                        // Determine if the date range is during the weekend (Friday-Sunday)
-                        $checkin_day = date('w', strtotime($guest['checkin_date'])); // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-                        $checkout_day = date('w', strtotime($guest['checkout_date']));
+    // Get the day of the week for the check-in date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    $checkin_day = date('w', strtotime($guest['checkin_date'])); 
 
-                        // Check if either check-in or check-out is on a weekend day (Friday-Sunday)
-                        $is_weekend = ($checkin_day == 5 || $checkin_day == 6 || $checkout_day == 5 || $checkout_day == 6 || $checkout_day == 0); // Friday-Sunday are weekends
+    // Check if the check-in date is Friday, Saturday, or Sunday for weekend pricing
+    $is_weekend = ($checkin_day == 5 || $checkin_day == 6 || $checkin_day == 0); // Friday-Sunday are weekends
 
-                        // Calculate the room price based on weekend or weekday
-                        $room_price = 0;
-                        if ($is_weekend) {
-                            // It's a weekend
-                            $room_price = $guest['weekend_price'];
-                        } else {
-                            // It's a weekday
-                            $room_price = $guest['weekday_price'];
-                        }
+    // Calculate the room price based on check-in day being a weekend or weekday
+    $room_price = 0;
+    if ($is_weekend) {
+        // Charge the weekend price if checking in on Friday, Saturday, or Sunday
+        $room_price = $guest['weekend_price'];
+    } else {
+        // Charge the weekday price if checking in any other day
+        $room_price = $guest['weekday_price'];
+    }
 
-                        echo number_format($room_price, 2); 
-                    ?></td> <!-- Display Room Price -->
+    echo number_format($room_price, 2); 
+?></td> <!-- Display Room Price -->
+
                     <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
                     <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
                     <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>

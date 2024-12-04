@@ -71,13 +71,19 @@ $result_bar = $stmt_bar->get_result();
 $bar_data = $result_bar->fetch_assoc();
 $bar_charges = $bar_data['bar_charges'] ?? 0;
 
-// Calculate total additional charges and room charges
+// Calculate additional charges (Kitchen + Bar)
 $additional_charges = $kitchen_charges + $bar_charges;
-$current_day = date('l');
-$room_price = ($current_day == 'Friday' || $current_day == 'Saturday' || $current_day == 'Sunday') 
+
+// Determine room price based on check-in date
+$checkin_day = date('l', strtotime($checkin_date)); // Get the day of the week for check-in date (e.g., 'Monday', 'Friday')
+$room_price = ($checkin_day == 'Friday' || $checkin_day == 'Saturday' || $checkin_day == 'Sunday') 
     ? $room_data['weekend_price'] 
     : $room_data['weekday_price'];
+
+// Calculate total charges (room charges + additional charges)
 $total_charges = $room_price + $additional_charges;
+
+
 
 ?>
 
@@ -91,7 +97,7 @@ $total_charges = $room_price + $additional_charges;
 </head>
 <body>
     <div class="receipt-container">
-        <h1>Antilla Apartment & Suites Receipt</h1>
+        <h1>Antilla Apartment & Suites Guest Checkout</h1>
         <p><strong>Guest Name:</strong> <?php echo htmlspecialchars($guest_name); ?></p>
         <p><strong>Guest ID:</strong> <?php echo htmlspecialchars($guest_id); ?></p>
         <p><strong>Room Number:</strong> <?php echo htmlspecialchars($room_number); ?></p>
@@ -111,7 +117,7 @@ $total_charges = $room_price + $additional_charges;
             <input type="hidden" name="room_number" value="<?php echo $room_number; ?>">
             <button type="submit" class="button">Complete Checkout</button>
         </form>
-        <h1>Thank You For Your Patronage</h1>
+        <h1>Print Out Reciept At Guest Management</h1>
     </div>
 </body>
 </html>
