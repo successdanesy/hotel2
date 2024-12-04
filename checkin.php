@@ -38,19 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt3->bind_param("isi", $guest_id, $guest_name, $room_number);
         $stmt3->execute();
 
-        // Also update related tables with the same guest_id
-        // For kitchen orders (example)
-        $update_kitchen_orders_query = "UPDATE kitchen_orders SET guest_id = ? WHERE room_number = ?";
-        $stmt4 = $conn->prepare($update_kitchen_orders_query);
-        $stmt4->bind_param("ii", $guest_id, $room_number);
-        $stmt4->execute();
-
-        // For bar orders (example)
-        $update_bar_orders_query = "UPDATE bar_orders SET guest_id = ? WHERE room_number = ?";
-        $stmt5 = $conn->prepare($update_bar_orders_query);
-        $stmt5->bind_param("ii", $guest_id, $room_number);
-        $stmt5->execute();
-
         // Commit transaction
         $conn->commit();
 

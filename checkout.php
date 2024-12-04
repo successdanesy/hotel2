@@ -14,29 +14,13 @@ if (!isset($_POST['room_number'])) {
 
 $room_number = $_POST['room_number'];
 
-// Fetch guest details from the rooms and bookings tables (ensure we are using the current guest_id)
-$query = "SELECT 
-            b.booking_id,
-            r.guest_name,
-            r.guest_id,
-            b.checkin_date,
-            b.checkout_date,
-            b.payment_status,
-            b.payment_method,
-            b.total_charges,
-            r.room_type,
-            r.weekday_price,
-            r.weekend_price
-          FROM bookings b
-          INNER JOIN rooms r ON b.room_number = r.room_number
-          WHERE b.guest_id = r.guest_id AND r.room_number = ?";
-
-
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $room_number);
-$stmt->execute();
-$result = $stmt->get_result();
-$room_data = $result->fetch_assoc();
+// Fetch guest details from the rooms table
+$query_room = "SELECT guest_id, guest_name, room_type, weekday_price, weekend_price FROM rooms WHERE room_number = ?";
+$stmt_room = $conn->prepare($query_room);
+$stmt_room->bind_param("i", $room_number);
+$stmt_room->execute();
+$result_room = $stmt_room->get_result();
+$room_data = $result_room->fetch_assoc();
 
 // Handle missing room data
 if (!$room_data) {
@@ -44,63 +28,57 @@ if (!$room_data) {
     exit();
 }
 
-// Get current guest's details from the rooms and bookings table
+// Extract guest details
 $guest_id = $room_data['guest_id'];
 $guest_name = $room_data['guest_name'];
-$checkin_date = $room_data['checkin_date'];
-$checkout_date = $room_data['checkout_date'];
+
+// Fetch booking details for debugging or any additional logic
+$query_booking = "SELECT checkin_date, checkout_date FROM bookings WHERE guest_id = ?";
+$stmt_booking = $conn->prepare($query_booking);
+$stmt_booking->bind_param("i", $guest_id);
+$stmt_booking->execute();
+$result_booking = $stmt_booking->get_result();
+
+if ($result_booking->num_rows > 0) {
+    $booking_data = $result_booking->fetch_assoc();
+    $checkin_date = $booking_data['checkin_date'];
+    $checkout_date = $booking_data['checkout_date'];
+} else {
+    die("Error: No booking details found for Guest ID: $guest_id.");
+}
 
 // Query for kitchen charges based on guest_id
 $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges
                   FROM kitchen_orders
                   WHERE guest_id = ? 
-                  AND status = 'completed'
-                  AND DATE(timestamp) BETWEEN ? AND ?";
+                  AND status = 'completed'";
 $stmt_kitchen = $conn->prepare($query_kitchen);
-$stmt_kitchen->bind_param("iss", $guest_id, $checkin_date, $checkout_date);
+$stmt_kitchen->bind_param("i", $guest_id);
+$stmt_kitchen->execute();
+$result_kitchen = $stmt_kitchen->get_result();
+$kitchen_data = $result_kitchen->fetch_assoc();
+$kitchen_charges = $kitchen_data['kitchen_charges'] ?? 0;
 
-if ($stmt_kitchen->execute()) {
-    $result_kitchen = $stmt_kitchen->get_result();
-    $kitchen_data = $result_kitchen->fetch_assoc();
-    $kitchen_charges = $kitchen_data['kitchen_charges'];
-} else {
-    die("Error fetching kitchen charges: " . $stmt_kitchen->error);
-}
-
-// Debugging
-error_log("Kitchen Query Parameters: Guest ID: $guest_id, Checkin Date: $checkin_date, Checkout Date: $checkout_date");
-
+// Query for bar charges based on guest_id
 $query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges
               FROM bar_orders
               WHERE guest_id = ? 
-              AND status = 'completed'
-              AND DATE(timestamp) BETWEEN ? AND ?";
+              AND status = 'completed'";
 $stmt_bar = $conn->prepare($query_bar);
-$stmt_bar->bind_param("iss", $guest_id, $checkin_date, $checkout_date);
+$stmt_bar->bind_param("i", $guest_id);
+$stmt_bar->execute();
+$result_bar = $stmt_bar->get_result();
+$bar_data = $result_bar->fetch_assoc();
+$bar_charges = $bar_data['bar_charges'] ?? 0;
 
-if ($stmt_bar->execute()) {
-    $result_bar = $stmt_bar->get_result();
-    $bar_data = $result_bar->fetch_assoc();
-    $bar_charges = $bar_data['bar_charges'];
-} else {
-    die("Error fetching bar charges: " . $stmt_bar->error);
-}
-
-// Debugging
-error_log("Bar Query Parameters: Guest ID: $guest_id, Checkin Date: $checkin_date, Checkout Date: $checkout_date");
-
-// Total additional charges
+// Calculate total additional charges and room charges
 $additional_charges = $kitchen_charges + $bar_charges;
-
-// Calculate the total charges based on the current day (weekday or weekend)
 $current_day = date('l');
 $room_price = ($current_day == 'Friday' || $current_day == 'Saturday' || $current_day == 'Sunday') 
     ? $room_data['weekend_price'] 
     : $room_data['weekday_price'];
-
 $total_charges = $room_price + $additional_charges;
 
-// Display receipt
 ?>
 
 <!DOCTYPE html>
@@ -113,9 +91,10 @@ $total_charges = $room_price + $additional_charges;
 </head>
 <body>
     <div class="receipt-container">
-        <h1>Antilla Apartment & Suits Receipt</h1>
+        <h1>Antilla Apartment & Suites Receipt</h1>
         <p><strong>Guest Name:</strong> <?php echo htmlspecialchars($guest_name); ?></p>
-        <p><strong>Room Number:</strong> <?php echo $room_number; ?></p>
+        <p><strong>Guest ID:</strong> <?php echo htmlspecialchars($guest_id); ?></p>
+        <p><strong>Room Number:</strong> <?php echo htmlspecialchars($room_number); ?></p>
         <p><strong>Room Type:</strong> <?php echo htmlspecialchars($room_data['room_type']); ?></p>
         <p><strong>Check-in Date:</strong> <?php echo htmlspecialchars($checkin_date); ?></p>
         <p><strong>Check-out Date:</strong> <?php echo htmlspecialchars($checkout_date); ?></p>
