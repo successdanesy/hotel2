@@ -1,17 +1,21 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
+    padding: 20px;
+    background: linear-gradient(to bottom, #f4f4f9, #e8ecf0);
+    color: #333;
+    width: 100%; /* Ensure body takes full width */
+    box-sizing: border-box; /* To include padding/border in the element's width/height calculation */
 }
 
 .main-content {
-    margin: 20px auto;
     padding: 20px;
-    max-width: 1200px;
+    width: 100%; /* Allow the content to span the full width of the page */
+    max-width: 100%; /* Remove the max-width limitation */
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 /* Header styling */
@@ -62,6 +66,7 @@ header p {
     margin-bottom: 20px;
     display: flex;
     gap: 10px;
+    flex-wrap: wrap; /* Ensure the form doesn't overflow */
 }
 
 .search-form input,
@@ -70,6 +75,21 @@ header p {
     font-size: 14px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    flex: 1 1 200px; /* Allow flexibility on smaller screens */
+}
+
+.search-form button {
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #fff;
+    background: #007bff;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background: #0056b3;
 }
 
 table {
@@ -88,13 +108,22 @@ table th {
     background-color: #f4f4f4;
 }
 
-.button {
+table tr:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}
+
+button {
     padding: 8px 12px;
     text-decoration: none;
     color: #fff;
     background: #007bff;
     border-radius: 5px;
     font-size: 14px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 .pagination {
@@ -114,4 +143,53 @@ table th {
 .pagination .page-link.active {
     background: #007bff;
     color: #fff;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    width: 100%; /* Ensure footer spans the full width */
+}
+
+@media screen and (max-width: 768px) {
+    /* Adjust header and button styles for smaller screens */
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    header h1 {
+        margin-bottom: 10px;
+    }
+
+    .search-form {
+        flex-direction: column;
+    }
+
+    .search-form input,
+    .search-form select,
+    .search-form button {
+        width: 100%; /* Full width inputs on smaller screens */
+    }
+
+    .main-content {
+        padding: 10px;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Adjust text sizes for mobile devices */
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    footer {
+        font-size: 0.8rem;
+    }
 }
