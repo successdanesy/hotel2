@@ -22,7 +22,7 @@ if ($conn->connect_error) {
 $search = isset($_GET['search']) ? '%' . $conn->real_escape_string($_GET['search']) . '%' : '%';
 $payment_status = isset($_GET['payment_status']) && $_GET['payment_status'] ? $conn->real_escape_string($_GET['payment_status']) : '%';
 
-// Simplified SQL query with subqueries to avoid GROUP BY issues
+// Updated query to search by guest_id, guest_name, room_number, or price
 $query = "
     SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status,
            r.weekday_price, r.weekend_price,
@@ -38,17 +38,16 @@ $query = "
            END AS status
     FROM bookings b
     LEFT JOIN rooms r ON b.room_number = r.room_number
-    WHERE (b.guest_name LIKE ? OR b.room_number LIKE ?)
+    WHERE (b.guest_name LIKE ? OR b.room_number LIKE ? OR b.guest_id LIKE ? OR 
+           (r.weekday_price + r.weekend_price) LIKE ?)
       AND b.payment_status LIKE ?
     ORDER BY b.checkin_date DESC";
-
-
 
 $stmt = $conn->prepare($query);
 if (!$stmt) {
     die("SQL Error: " . $conn->error);
 }
-$stmt->bind_param("sss", $search, $search, $payment_status);
+$stmt->bind_param("sssss", $search, $search, $search, $search, $payment_status);
 $stmt->execute();
 $result = $stmt->get_result();
 if (!$result) {
@@ -84,7 +83,7 @@ while ($row = $result->fetch_assoc()) {
         </header>
 
         <form method="GET" action="guest_management.php" class="search-form">
-            <input type="text" name="search" placeholder="Search by name or room number" 
+            <input type="text" name="search" placeholder="Search by guest ID, name, room number, or price" 
                    value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
             <select name="payment_status">
                 <option value="">All Payment Status</option>
@@ -95,65 +94,60 @@ while ($row = $result->fetch_assoc()) {
         </form>
 
         <!-- Guest Table -->
-        <!-- Guest Table -->
-<section class="guest-list">
-    <h2>Guest List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Guest ID</th> <!-- New Column for Guest ID -->
-                <th>Guest Name</th>
-                <th>Room Number</th>
-                <th>Room Price</th> <!-- Room Price Column -->
-                <th>Check-in Date</th>
-                <th>Check-out Date</th>
-                <th>Payment Status</th>
-                <th>Kitchen Order</th>
-                <th>Bar Order</th>
-                <th>Total Paid</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($guests as $guest): ?>
-                <tr>
-                <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
-                <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
+        <section class="guest-list">
+            <h2>Guest List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Guest ID</th>
+                        <th>Guest Name</th>
+                        <th>Room Number</th>
+                        <th>Room Price</th>
+                        <th>Check-in Date</th>
+                        <th>Check-out Date</th>
+                        <th>Payment Status</th>
+                        <th>Kitchen Order</th>
+                        <th>Bar Order</th>
+                        <th>Total Paid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($guests as $guest): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
+                            <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
+                            <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
+                            <td>₦<?php 
+                                // Get the day of the week for the check-in date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+                                $checkin_day = date('w', strtotime($guest['checkin_date'])); 
 
-                    <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
-                    <td>₦<?php 
-    // Get the day of the week for the check-in date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-    $checkin_day = date('w', strtotime($guest['checkin_date'])); 
+                                // Check if the check-in date is Friday, Saturday, or Sunday for weekend pricing
+                                $is_weekend = ($checkin_day == 5 || $checkin_day == 6 || $checkin_day == 0); // Friday-Sunday are weekends
 
-    // Check if the check-in date is Friday, Saturday, or Sunday for weekend pricing
-    $is_weekend = ($checkin_day == 5 || $checkin_day == 6 || $checkin_day == 0); // Friday-Sunday are weekends
+                                // Calculate the room price based on check-in day being a weekend or weekday
+                                $room_price = 0;
+                                if ($is_weekend) {
+                                    $room_price = $guest['weekend_price'];
+                                } else {
+                                    $room_price = $guest['weekday_price'];
+                                }
 
-    // Calculate the room price based on check-in day being a weekend or weekday
-    $room_price = 0;
-    if ($is_weekend) {
-        // Charge the weekend price if checking in on Friday, Saturday, or Sunday
-        $room_price = $guest['weekend_price'];
-    } else {
-        // Charge the weekday price if checking in any other day
-        $room_price = $guest['weekday_price'];
-    }
+                                echo number_format($room_price, 2); 
+                            ?></td> <!-- Display Room Price -->
 
-    echo number_format($room_price, 2); 
-?></td> <!-- Display Room Price -->
-
-                    <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
-                    <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
-                    <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
-                    <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
-                    <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
-                    <td>₦<?php echo number_format(
-                        $guest['kitchen_order_total'] + $guest['bar_order_total'] + $room_price, 2); 
-                    ?></td> <!-- Total Paid -->
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</section>
-
+                            <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
+                            <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
+                            <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
+                            <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
+                            <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
+                            <td>₦<?php echo number_format(
+                                $guest['kitchen_order_total'] + $guest['bar_order_total'] + $room_price, 2); 
+                            ?></td> <!-- Total Paid -->
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </section>
     </div>
 
     <!-- Footer -->
