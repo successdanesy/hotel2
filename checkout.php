@@ -80,6 +80,24 @@ $room_price = ($checkin_day == 'Friday' || $checkin_day == 'Saturday' || $checki
     ? $room_data['weekend_price'] 
     : $room_data['weekday_price'];
 
+// Calculate total room charges for the duration of the stay
+$checkin_date_obj = new DateTime($checkin_date);
+$checkout_date_obj = new DateTime($checkout_date);
+$interval = $checkin_date_obj->diff($checkout_date_obj);
+$total_days = $interval->days;
+
+$total_room_charges = 0;
+
+for ($i = 0; $i < $total_days; $i++) {
+    $current_day = $checkin_date_obj->format('l'); // Get the day of the week
+    $daily_rate = ($current_day == 'Friday' || $current_day == 'Saturday' || $current_day == 'Sunday') 
+        ? $room_data['weekend_price'] 
+        : $room_data['weekday_price'];
+    
+    $total_room_charges += $daily_rate;
+    $checkin_date_obj->modify('+1 day'); // Move to the next day
+}
+
 // Calculate total charges (room charges + additional charges)
 $total_charges = $room_price + $additional_charges;
 
@@ -104,7 +122,7 @@ $total_charges = $room_price + $additional_charges;
         <p><strong>Room Type:</strong> <?php echo htmlspecialchars($room_data['room_type']); ?></p>
         <p><strong>Check-in Date:</strong> <?php echo htmlspecialchars($checkin_date); ?></p>
         <p><strong>Check-out Date:</strong> <?php echo htmlspecialchars($checkout_date); ?></p>
-        <p><strong>Room Charges:</strong> ₦<?php echo number_format($room_price, 2); ?></p>
+        <p><strong>Room Charges (<?php echo $total_days; ?> days):</strong> ₦<?php echo number_format($total_room_charges, 2); ?></p>
         <p><strong>Kitchen Charges:</strong> ₦<?php echo number_format($kitchen_charges, 2); ?></p>
         <p><strong>Bar Charges:</strong> ₦<?php echo number_format($bar_charges, 2); ?></p>
         <p><strong>Additional Charges (Bar/Kitchen):</strong> ₦<?php echo number_format($additional_charges, 2); ?></p>
