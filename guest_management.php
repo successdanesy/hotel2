@@ -112,12 +112,12 @@ while ($row = $result->fetch_assoc()) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($guests as $guest): ?>
+                <?php foreach ($guests as $guest): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
                             <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
                             <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
-                            <td>₦<?php 
+                            <td>₦<?php  
                                 // Get the day of the week for the check-in date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
                                 $checkin_day = date('w', strtotime($guest['checkin_date'])); 
 
@@ -143,6 +143,12 @@ while ($row = $result->fetch_assoc()) {
                             <td>₦<?php echo number_format(
                                 $guest['kitchen_order_total'] + $guest['bar_order_total'] + $room_price, 2); 
                             ?></td> <!-- Total Paid -->
+                            <td>
+                                <a href="receipt.php?guest_id=<?php echo $guest['guest_id']; ?>" class="button">View</a>
+                            </td>
+
+
+
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
