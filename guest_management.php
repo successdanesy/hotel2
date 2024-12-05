@@ -24,7 +24,7 @@ $payment_status = isset($_GET['payment_status']) && $_GET['payment_status'] ? $c
 
 // Updated query to search by guest_id, guest_name, room_number, or price
 $query = "
-    SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status,
+    SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status, b.price, b.total_charges,
            r.weekday_price, r.weekend_price,
            (SELECT IFNULL(SUM(k.total_amount), 0) 
             FROM kitchen_orders k 
@@ -117,32 +117,16 @@ while ($row = $result->fetch_assoc()) {
                             <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
                             <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
                             <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
-                            <td>₦<?php  
-                                // Get the day of the week for the check-in date (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-                                $checkin_day = date('w', strtotime($guest['checkin_date'])); 
+                            <td><?php echo htmlspecialchars($guest['price']); ?></td>
 
-                                // Check if the check-in date is Friday, Saturday, or Sunday for weekend pricing
-                                $is_weekend = ($checkin_day == 5 || $checkin_day == 6 || $checkin_day == 0); // Friday-Sunday are weekends
-
-                                // Calculate the room price based on check-in day being a weekend or weekday
-                                $room_price = 0;
-                                if ($is_weekend) {
-                                    $room_price = $guest['weekend_price'];
-                                } else {
-                                    $room_price = $guest['weekday_price'];
-                                }
-
-                                echo number_format($room_price, 2); 
-                            ?></td> <!-- Display Room Price -->
 
                             <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
                             <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
                             <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
                             <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
                             <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
-                            <td>₦<?php echo number_format(
-                                $guest['kitchen_order_total'] + $guest['bar_order_total'] + $room_price, 2); 
-                            ?></td> <!-- Total Paid -->
+                            <td>₦<?php echo number_format($guest['total_charges'], 2); ?></td>
+                            <!-- Total Paid -->
                             <td>
                                 <a href="receipt.php?guest_id=<?php echo $guest['guest_id']; ?>" class="button">View</a>
                             </td>

@@ -19,7 +19,7 @@ if (empty($actual_checkout_date)) {
     die("Error: Actual checkout date cannot be empty.");
 }
 
-// Fetch current guest details from rooms table using guest_id
+// Fetch guest and room details
 $query_room = "SELECT guest_id, guest_name, room_type, weekday_price, weekend_price FROM rooms WHERE room_number = ?";
 $stmt_room = $conn->prepare($query_room);
 $stmt_room->bind_param("i", $room_number);
@@ -30,56 +30,78 @@ if ($result_room->num_rows > 0) {
     $room = $result_room->fetch_assoc();
     $guest_id = $room['guest_id'];
     $guest_name = $room['guest_name'];
-    $room_type = $room['room_type'];
     $weekday_price = $room['weekday_price'];
     $weekend_price = $room['weekend_price'];
 
-    // Fetch additional charges (e.g., kitchen, bar charges) for this guest
-    $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges FROM kitchen_orders WHERE guest_id = ? AND status = 'completed'";
-    $stmt_kitchen = $conn->prepare($query_kitchen);
-    $stmt_kitchen->bind_param("i", $guest_id);
-    $stmt_kitchen->execute();
-    $result_kitchen = $stmt_kitchen->get_result();
-    $kitchen_charges = $result_kitchen->fetch_assoc()['kitchen_charges'];
+    // Fetch booking details
+    $query_booking = "SELECT checkin_date FROM bookings WHERE guest_id = ?";
+    $stmt_booking = $conn->prepare($query_booking);
+    $stmt_booking->bind_param("i", $guest_id);
+    $stmt_booking->execute();
+    $result_booking = $stmt_booking->get_result();
 
-    $query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges FROM bar_orders WHERE guest_id = ? AND status = 'completed'";
-    $stmt_bar = $conn->prepare($query_bar);
-    $stmt_bar->bind_param("i", $guest_id);
-    $stmt_bar->execute();
-    $result_bar = $stmt_bar->get_result();
-    $bar_charges = $result_bar->fetch_assoc()['bar_charges'];
+    if ($result_booking->num_rows > 0) {
+        $booking = $result_booking->fetch_assoc();
+        $checkin_date = $booking['checkin_date'];
 
-    // Calculate total charges
-    $current_day = date('l');
-    $room_price = ($current_day == 'Friday' || $current_day == 'Saturday' || $current_day == 'Sunday') 
-        ? $weekend_price 
-        : $weekday_price;
+        // Determine the room price based on the check-in day
+        $checkin_day = date('l', strtotime($checkin_date));
+        $is_weekend = in_array($checkin_day, ['Friday', 'Saturday', 'Sunday']);
+        $room_price = $is_weekend ? $weekend_price : $weekday_price;
 
-    $total_charges = $room_price + $kitchen_charges + $bar_charges;
+        // Calculate total days of stay (excluding checkout day)
+        $checkin_date_obj = new DateTime($checkin_date);
+        $checkout_date_obj = new DateTime($actual_checkout_date);
+        $total_days = $checkin_date_obj->diff($checkout_date_obj)->days;
 
-    // Update the guest's checkout date and total charges in the bookings table
-    $update_booking_query = "UPDATE bookings SET checkout_date = ?, total_charges = ? WHERE guest_id = ?";
-    $stmt_update_booking = $conn->prepare($update_booking_query);
-    $stmt_update_booking->bind_param("sdi", $actual_checkout_date, $total_charges, $guest_id);
+        // Calculate total room charges
+        $total_room_charges = $room_price * $total_days;
 
-    if ($stmt_update_booking->execute()) {
-        // Update the room status and clear guest details
-        $update_room_query = "UPDATE rooms SET status = 'Available', guest_id = NULL, guest_name = NULL WHERE room_number = ?";
-        $stmt_update_room = $conn->prepare($update_room_query);
-        $stmt_update_room->bind_param("i", $room_number);
+        // Fetch kitchen and bar charges
+        $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges FROM kitchen_orders WHERE guest_id = ? AND status = 'completed'";
+        $stmt_kitchen = $conn->prepare($query_kitchen);
+        $stmt_kitchen->bind_param("i", $guest_id);
+        $stmt_kitchen->execute();
+        $kitchen_charges = $stmt_kitchen->get_result()->fetch_assoc()['kitchen_charges'] ?? 0;
 
-        if ($stmt_update_room->execute()) {
-            // Redirect on successful checkout
-            header('Location: room.php?message=Checkout completed successfully.');
+        $query_bar = "SELECT COALESCE(SUM(total_amount), 0) AS bar_charges FROM bar_orders WHERE guest_id = ? AND status = 'completed'";
+        $stmt_bar = $conn->prepare($query_bar);
+        $stmt_bar->bind_param("i", $guest_id);
+        $stmt_bar->execute();
+        $bar_charges = $stmt_bar->get_result()->fetch_assoc()['bar_charges'] ?? 0;
+
+        // Calculate total charges
+        $additional_charges = $kitchen_charges + $bar_charges;
+        $total_charges = $total_room_charges + $additional_charges;
+
+        // Update booking with the actual checkout date and total charges
+        $update_booking_query = "UPDATE bookings SET checkout_date = ?, total_charges = ? WHERE guest_id = ?";
+        $stmt_update_booking = $conn->prepare($update_booking_query);
+        $stmt_update_booking->bind_param("sdi", $actual_checkout_date, $total_charges, $guest_id);
+
+        if ($stmt_update_booking->execute()) {
+            // Update room status
+            $update_room_query = "UPDATE rooms SET status = 'Available', guest_id = NULL, guest_name = NULL WHERE room_number = ?";
+            $stmt_update_room = $conn->prepare($update_room_query);
+            $stmt_update_room->bind_param("i", $room_number);
+
+            if ($stmt_update_room->execute()) {
+                // Redirect on success
+                header('Location: room.php?message=Checkout completed successfully.');
+                exit();
+            } else {
+                die("Error updating room status: " . $stmt_update_room->error);
+            }
         } else {
-            die("Error updating room status: " . $stmt_update_room->error);
+            die("Error updating booking: " . $stmt_update_booking->error);
         }
     } else {
-        die("Error updating checkout date or total charges: " . $stmt_update_booking->error);
+        die("Error: No booking found for the guest.");
     }
 } else {
-    die("Error: No current guest found for the room.");
+    die("Error: No room data found for the provided room number.");
 }
 
 exit();
+
 ?>
