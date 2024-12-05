@@ -18,6 +18,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mark_completed'])) {
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
 
+     // Update the order status to 'Completed'
+     $update_query = "UPDATE bar_orders SET status = 'Completed' WHERE id = ?";
+     $stmt = $conn->prepare($update_query);
+     $stmt->bind_param("i", $order_id);
+     $stmt->execute();
+
     // Check if the update was successful
     if ($stmt->affected_rows > 0) {
         echo json_encode(['status' => 'Completed']);

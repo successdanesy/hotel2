@@ -29,6 +29,10 @@ $result_bar = $conn->query($sql_bar);
 $query = "SELECT * FROM kitchen_orders WHERE status = 'sent to front desk'";
 $result = $conn->query($query);
 
+// Fetch orders marked as 'sent to front desk' bar
+$query = "SELECT * FROM bar_orders WHERE status = 'sent to front desk'";
+$result = $conn->query($query);
+
 
 
 // Fetch all orders and display them as needed
