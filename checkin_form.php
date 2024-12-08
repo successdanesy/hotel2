@@ -62,6 +62,9 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
                 <label for="price">Price (per night):</label>
                 <input type="text" id="price" name="price" value="<?php echo $price; ?>" readonly>
 
+                <label for="discount">Discount Amount (₦):</label>
+                <input type="text" id="discount" name="discount" placeholder="Enter discount" oninput="validateDiscountInput(event)">
+
                 <label for="payment_status">Payment Status:</label>
                 <select id="payment_status" name="payment_status" required>
                     <option value="Pay Now">Pay Now</option>

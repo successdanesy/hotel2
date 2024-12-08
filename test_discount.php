@@ -32,8 +32,8 @@ if (!$room_data) {
 $guest_id = $room_data['guest_id'];
 $guest_name = $room_data['guest_name'];
 
-// Fetch booking details
-$query_booking = "SELECT checkin_date, checkout_date, discount FROM bookings WHERE guest_id = ?";
+// Fetch booking details for debugging or any additional logic
+$query_booking = "SELECT checkin_date, checkout_date FROM bookings WHERE guest_id = ?";
 $stmt_booking = $conn->prepare($query_booking);
 $stmt_booking->bind_param("i", $guest_id);
 $stmt_booking->execute();
@@ -43,7 +43,6 @@ if ($result_booking->num_rows > 0) {
     $booking_data = $result_booking->fetch_assoc();
     $checkin_date = $booking_data['checkin_date'];
     $checkout_date = $booking_data['checkout_date'];
-    $discount = $booking_data['discount'] ?? 0; // Default to 0 if no discount
 } else {
     die("Error: No booking details found for Guest ID: $guest_id.");
 }
@@ -82,20 +81,26 @@ $is_weekend = in_array($checkin_day, ['Friday', 'Saturday', 'Sunday']);
 // Use weekend price or weekday price based on the check-in day
 $room_price = $is_weekend ? $room_data['weekend_price'] : $room_data['weekday_price'];
 
-// Adjust the room price based on the discount
-$discounted_price = max(0, $room_price - $discount); // Ensure the price doesn't go below 0
-
 // Calculate the total number of nights (excluding checkout day)
 $checkin_date_obj = new DateTime($checkin_date);
 $checkout_date_obj = new DateTime($checkout_date);
 $total_days = $checkin_date_obj->diff($checkout_date_obj)->days; // Total nights
 
-// Calculate total room charges with the discounted price
-$total_room_charges = $discounted_price * $total_days;
+// Calculate total room charges for the stay
+$total_room_charges = $room_price * $total_days;
 
-// Recalculate total charges including additional charges
+// Include additional charges
 $total_charges = $total_room_charges + $additional_charges;
 
+// Check if discount is applied (from POST)
+$discount = isset($_POST['discount']) ? $_POST['discount'] : 0;
+$discount = str_replace(',', '', $discount);  // Remove commas
+$discount = is_numeric($discount) ? (float)$discount : 0; // Ensure it's a valid number
+
+// Subtract the discount from the total charges
+$final_total = $total_charges - $discount;
+
+// Pass these values to the front-end for rendering the receipt
 ?>
 
 <!DOCTYPE html>
@@ -115,23 +120,27 @@ $total_charges = $total_room_charges + $additional_charges;
         <p><strong>Room Type:</strong> <?php echo htmlspecialchars($room_data['room_type']); ?></p>
         <p><strong>Check-in Date:</strong> <?php echo htmlspecialchars($checkin_date); ?></p>
         <p><strong>Check-out Date:</strong> <?php echo htmlspecialchars($checkout_date); ?></p>
-        <p><strong>Original Room Price (Per Night):</strong> ₦<?php echo number_format($room_price, 2); ?></p>
-        <p><strong>Discount Applied (Per Night):</strong> ₦<?php echo number_format($discount, 2); ?></p>
-        <p><strong>Room Price After Discount(Per Night):</strong> ₦<?php echo number_format($discounted_price, 2); ?></p>
-        <p><strong>Room Charges (<?php echo $total_days; ?> nights @ ₦<?php echo number_format($discounted_price, 2); ?> per night):</strong> ₦<?php echo number_format($total_room_charges, 2); ?></p>
+        <p><strong>Room Charges (<?php echo $total_days; ?> nights @ ₦<?php echo number_format($room_price, 2); ?> per night):</strong> ₦<?php echo number_format($total_room_charges, 2); ?></p>
         <p><strong>Kitchen Charges:</strong> ₦<?php echo number_format($kitchen_charges, 2); ?></p>
         <p><strong>Bar Charges:</strong> ₦<?php echo number_format($bar_charges, 2); ?></p>
         <p><strong>Additional Charges (Bar/Kitchen):</strong> ₦<?php echo number_format($additional_charges, 2); ?></p>
         <hr>
         <p><strong>Total Charges:</strong> ₦<?php echo number_format($total_charges, 2); ?></p>
 
-        <form action="complete_checkout.php" method="POST">
-            <label for="actual_checkout_date">Actual Checkout Date:</label>
-            <input type="date" id="actual_checkout_date" name="actual_checkout_date" value="<?php echo date('Y-m-d'); ?>" required>
+        <!-- Discount Input -->
+        <form action="checkout.php" method="POST">
+            <label for="discount">Discount:</label>
+            <input type="text" id="discount" name="discount" value="₦<?php echo number_format($discount, 2); ?>">
+            <label for="apply_discount">Input Discount And Press Enter</label>
+            <input type="checkbox" id="apply_discount" name="apply_discount" value="1" <?php echo ($discount > 0 ? 'checked' : ''); ?>>
+
+            <hr>
+            <p><strong>Final Total After Discount:</strong> ₦<?php echo number_format($final_total, 2); ?></p>
+
+            <!-- Checkout Form -->
             <input type="hidden" name="room_number" value="<?php echo $room_number; ?>">
             <button type="submit" class="button">Complete Checkout</button>
         </form>
-        <h1>Print Out Receipt At Guest Management</h1>
     </div>
 </body>
 </html>
