@@ -112,6 +112,10 @@ $orders = fetchOrders($conn);
             <a href="logout.php" class="button new-guest">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
+
+            <a href="imprest_request.php" class="button new-guest">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Imprest Request
+            </a>
         </header>
     
     

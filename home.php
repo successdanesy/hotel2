@@ -84,7 +84,7 @@ $result = $conn->query($query);
 
                 <!-- Service Requests Section -->
                 <section class="service-requests">
-                    <h2>Upcoming Service Requests</h2>
+                    <h2>Imprest Section</h2>
                     <div class="request-item">
                         <span><i class="fas fa-wine-bottle"></i> Bar Request: Additional wine bottles needed at bar</span>
                         <span>07:30 AM</span>
@@ -93,12 +93,8 @@ $result = $conn->query($query);
                         <span><i class="fas fa-exclamation-circle"></i> Kitchen Update: Out of grilled salmon until further notice</span>
                         <span>08:15 AM</span>
                     </div>
-                    <div class="request-item">
-                        <span><i class="fas fa-concierge-bell"></i> Front Desk: Confirmed late checkout for Room 205</span>
-                        <span>09:00 AM</span>
-                    </div>
                     <button class="button view-schedule">
-                        <i class="fas fa-calendar"></i> <a href="service-requests.php">View Full Schedule</a>
+                        <i class="fas fa-calendar"></i> <a href="service-requests.php">View Full Requests</a>
                     </button>
                 </section>
 

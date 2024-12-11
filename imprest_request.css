@@ -1,0 +1,75 @@
+/* Imprest Section Styling */
+#imprestForm {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+#imprestTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#imprestTable th, #imprestTable td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+#imprestTable th {
+    background-color: #f2f2f2;
+    text-align: left;
+    font-weight: bold;
+}
+
+#imprestTable td {
+    text-align: center;
+    color: #333;
+}
+
+#imprestTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+button {
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+input[type="text"]:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+h2, h3 {
+    color: #333;
+}
+
+.alert-success {
+    color: green;
+}
+
+.alert-danger {
+    color: red;
+}
