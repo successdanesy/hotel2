@@ -9,12 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_request'])) {
     $price = $_POST['price'] ?? null;
 
     if (!empty($itemName) && !empty($quantity)) {
-        $query = "INSERT INTO imprest_requests (item_name, quantity, price, status, timestamp)
+        $query = "INSERT INTO imprest_requests_bar (item_name, quantity, price, status, timestamp)
                   VALUES (?, ?, ?, 'Pending', NOW())";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("ssd", $itemName, $quantity, $price);
         if ($stmt->execute()) {
-            header("Location: imprest_request.php");
+            header("Location: imprest_request_bar.php");
             exit();
         } else {
             $error = "Error adding the imprest request: " . $stmt->error;
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_request'])) {
 
 // Fetch all imprest requests
 function fetchRequests($conn) {
-    $query = "SELECT id, item_name, quantity, price, status, timestamp FROM imprest_requests ORDER BY timestamp DESC";
+    $query = "SELECT id, item_name, quantity, price, status, timestamp FROM imprest_requests_bar ORDER BY timestamp DESC";
     return $conn->query($query)->fetch_all(MYSQLI_ASSOC);
 }
 
@@ -38,19 +38,19 @@ $requests = fetchRequests($conn);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kitchen Imprest Requests</title>
+    <title>Bar Imprest Requests</title>
     <link rel="stylesheet" href="imprest_request.css">
 </head>
 <body>
 <div class="main-content">
     <header>
-    <h1>Kitchen Imprest Requests</h1>
-        <a href="kitchen.php" class="button">Back to Kitchen</a>
+    <h1>Bar Imprest Requests</h1>
+        <a href="bar.php" class="button">Back to Bar</a>
 
         <a href="logout.php" class="button">Logout</a>
     </header>
 
-    <form method="POST" action="imprest_request.php">
+    <form method="POST" action="imprest_request_bar.php">
         <label for="item_name">Item Name:</label>
         <input type="text" name="item_name" id="item_name" required>
 
@@ -88,6 +88,6 @@ $requests = fetchRequests($conn);
         </tbody>
     </table>
 </div>
-<script src="imprest_request.js"></script>
+<script src="imprest_request_bar.js"></script>
 </body>
 </html>

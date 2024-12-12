@@ -105,6 +105,10 @@ $orders = fetchOrders($conn);
         <header>
         <h1>Bar Orders</h1>
             <p>Manage Bar Orders Below.</p>
+
+            <a href="imprest_request_bar.php" class="button new-guest">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Bar imprest
+            </a>
             <a href="logout.php" class="button new-guest">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>

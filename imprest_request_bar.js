@@ -63,7 +63,7 @@ document.getElementById('submitRequests').addEventListener('click', () => {
         return;
     }
 
-    fetch('submit_imprest_requests.php', {
+    fetch('submit_imprest_requests_bar.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
