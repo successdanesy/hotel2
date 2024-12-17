@@ -24,16 +24,9 @@ $result_kitchen = $conn->query($sql_kitchen);
 $sql_bar = "SELECT * FROM bar_orders"; // Adjust this query based on your table and schema
 $result_bar = $conn->query($sql_bar);
 
-
-// Fetch orders marked as 'sent to front desk'
-$query = "SELECT * FROM kitchen_orders WHERE status = 'sent to front desk'";
-$result = $conn->query($query);
-
-// Fetch orders marked as 'sent to front desk' bar
-$query = "SELECT * FROM bar_orders WHERE status = 'sent to front desk'";
-$result = $conn->query($query);
-
-
+// Fetching Imprest Requests
+$sql_imprest = "SELECT * FROM imprest_requests WHERE status != 'pending'";
+$result_imprest = $conn->query($sql_imprest);
 
 // Fetch all orders and display them as needed
 
@@ -44,7 +37,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antilla Apartments & Suites - Hotel Management Dashboard</title>
+    <title>Antilla Front Desk</title>
     <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -54,15 +47,17 @@ $result = $conn->query($query);
     <div class="main-content">
         <!-- Header -->
         <header>
-            <input type="text" placeholder="Search rooms, services, and guests" class="search-bar">
-            <a href="room.php" class="button new-guest">
-                <i class="fas fa-user-plus"></i> New Guest
-            </a>
-            <a href="logout.php" class="button new-guest">
+    <h1>Front-Desk Page</h1>
+    <div class="welcome">
+        <i class="fas fa-user"></i>
+        <span>Welcome, Front-Desk</span>
+    </div>
+
+    <a href="logout.php" class="button new-guest">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
             <div class="welcome"><i class="fas fa-user-circle"></i> Welcome <?php echo $_SESSION['username']; ?></div>
-        </header>
+</header>
 
         <!-- Dashboard Content -->
         <div class="dashboard">
@@ -72,7 +67,6 @@ $result = $conn->query($query);
                     <h2>Room Management</h2>
                     <div class="room-status">
                         <div class="rooms-header">Check Rooms</div>
-                        <p>These are the available rooms</p>
                         <button class="button view-tasks">
                             <i class="fas fa-tasks"></i> <a href="room.php">View all rooms</a>
                         </button>
@@ -82,21 +76,10 @@ $result = $conn->query($query);
                     </div>
                 </section>
 
-                <!-- Service Requests Section -->
-                <section class="service-requests">
-                    <h2>Imprest Section</h2>
-                    <div class="request-item">
-                        <span><i class="fas fa-wine-bottle"></i> Bar Request: Additional wine bottles needed at bar</span>
-                        <span>07:30 AM</span>
-                    </div>
-                    <div class="request-item">
-                        <span><i class="fas fa-exclamation-circle"></i> Kitchen Update: Out of grilled salmon until further notice</span>
-                        <span>08:15 AM</span>
-                    </div>
-                    <button class="button view-schedule">
-                        <i class="fas fa-calendar"></i> <a href="service-requests.php">View Full Requests</a>
-                    </button>
-                </section>
+
+
+
+
 
                 <!-- Kitchen Order Section -->
 <section class="kitchen-order">
