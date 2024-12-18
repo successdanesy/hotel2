@@ -93,5 +93,20 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
             </form>
         </section>
     </div>
+
+    <script>
+    // Function to validate discount input
+    function validateDiscountInput(event) {
+        const input = event.target;
+        const value = input.value;
+
+        // Only allow numbers and check if it's not empty
+        if (!/^\d*$/.test(value)) {
+            input.value = ''; // Clear the input
+            alert('Please enter a valid number for discount.');
+        }
+    }
+</script>
+
 </body>
 </html>
