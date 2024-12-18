@@ -60,11 +60,15 @@ if ($result_room->num_rows > 0) {
 
         // Calculate total charges
         $additional_charges = $kitchen_charges + $bar_charges;
+        $total_days = (new DateTime($checkout_date))->diff(new DateTime($checkin_date))->days;
         $total_room_charges = $adjusted_room_price * $total_days;
         $total_charges = $total_room_charges + $additional_charges;
 
         // Final total after discount (no additional subtraction)
         $final_total_after_discount = $total_charges;
+
+        // Debug values
+        var_dump($total_charges, $final_total_after_discount); // Add debugging to see the values
 
         // Update booking
         $update_booking_query = "UPDATE bookings SET total_charges = ? WHERE guest_id = ?";
