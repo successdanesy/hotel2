@@ -24,7 +24,7 @@ $payment_status = isset($_GET['payment_status']) && $_GET['payment_status'] ? $c
 
 // Updated query to search by guest_id, guest_name, room_number, or price
 $query = "
-    SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status, b.price, b.total_charges,
+    SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status, b.price, b.total_charges, b.discount,
            r.weekday_price, r.weekend_price,
            (SELECT IFNULL(SUM(k.total_amount), 0) 
             FROM kitchen_orders k 
@@ -42,6 +42,7 @@ $query = "
            (r.weekday_price + r.weekend_price) LIKE ?)
       AND b.payment_status LIKE ?
     ORDER BY b.checkin_date DESC";
+
 
 $stmt = $conn->prepare($query);
 if (!$stmt) {
@@ -97,46 +98,44 @@ while ($row = $result->fetch_assoc()) {
         <section class="guest-list">
             <h2>Guest List</h2>
             <table>
-                <thead>
-                    <tr>
-                        <th>Guest ID</th>
-                        <th>Guest Name</th>
-                        <th>Room Number</th>
-                        <th>Room Price</th>
-                        <th>Check-in Date</th>
-                        <th>Check-out Date</th>
-                        <th>Payment Status</th>
-                        <th>Kitchen Order</th>
-                        <th>Bar Order</th>
-                        <th>Total Paid</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($guests as $guest): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
-                            <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
-                            <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
-                            <td><?php echo htmlspecialchars($guest['price']); ?></td>
+    <thead>
+        <tr>
+            <th>Guest ID</th>
+            <th>Guest Name</th>
+            <th>Room Number</th>
+            <th>Room Price</th>
+            <th>Check-in Date</th>
+            <th>Check-out Date</th>
+            <th>Payment Status</th>
+            <th>Kitchen Order</th>
+            <th>Bar Order</th>
+            <th>Total Charges</th>
+            <th>Discount</th> <!-- New column for discount -->
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($guests as $guest): ?>
+        <tr>
+            <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
+            <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
+            <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
+            <td>₦<?php echo number_format($guest['price'], 2); ?></td>
+            <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
+            <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
+            <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
+            <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
+            <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
+            <td>₦<?php echo number_format($guest['total_charges'], 2); ?></td>
+            <td>₦<?php echo number_format($guest['discount'] ?? 0, 2); ?></td>
+ <!-- Display the discount -->
+            <td>
+                <a href="receipt.php?guest_id=<?php echo $guest['guest_id']; ?>" class="button">View</a>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
 
-
-                            <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
-                            <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
-                            <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
-                            <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
-                            <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
-                            <td>₦<?php echo number_format($guest['total_charges'], 2); ?></td>
-                            <!-- Total Paid -->
-                            <td>
-                                <a href="receipt.php?guest_id=<?php echo $guest['guest_id']; ?>" class="button">View</a>
-                            </td>
-
-
-
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
         </section>
     </div>
 

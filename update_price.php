@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $result2 = mysqli_query($conn, $sql2);
 
             if ($result1 && $result2) {
-                header('Location: manager.php');
+                header('Location: manager_imprest.php');
                 exit();
             } else {
                 echo "Error updating the records.";

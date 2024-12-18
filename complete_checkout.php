@@ -6,18 +6,14 @@ include('db_connect.php');
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Check if room number and actual checkout date are provided
-if (!isset($_POST['room_number']) || !isset($_POST['actual_checkout_date'])) {
-    die("Error: Room number and actual checkout date are required for checkout.");
+// Check if room number is provided
+if (!isset($_POST['room_number'])) {
+    die("Error: Room number is required for checkout.");
 }
 
 $room_number = $_POST['room_number'];
-$actual_checkout_date = $_POST['actual_checkout_date'];
-
-// Validate `actual_checkout_date`
-if (empty($actual_checkout_date)) {
-    die("Error: Actual checkout date cannot be empty.");
-}
+$checkout_date = isset($_POST['checkout_date']) ? $_POST['checkout_date'] : date('Y-m-d'); // Allow manual input or default to current date
+$discount = isset($_POST['discount']) ? floatval($_POST['discount']) : 0; // Convert discount to float
 
 // Fetch guest and room details
 $query_room = "SELECT guest_id, guest_name, room_type, weekday_price, weekend_price FROM rooms WHERE room_number = ?";
@@ -29,9 +25,6 @@ $result_room = $stmt_room->get_result();
 if ($result_room->num_rows > 0) {
     $room = $result_room->fetch_assoc();
     $guest_id = $room['guest_id'];
-    $guest_name = $room['guest_name'];
-    $weekday_price = $room['weekday_price'];
-    $weekend_price = $room['weekend_price'];
 
     // Fetch booking details
     $query_booking = "SELECT checkin_date FROM bookings WHERE guest_id = ?";
@@ -47,15 +40,10 @@ if ($result_room->num_rows > 0) {
         // Determine the room price based on the check-in day
         $checkin_day = date('l', strtotime($checkin_date));
         $is_weekend = in_array($checkin_day, ['Friday', 'Saturday', 'Sunday']);
-        $room_price = $is_weekend ? $weekend_price : $weekday_price;
+        $room_price = $is_weekend ? $room['weekend_price'] : $room['weekday_price'];
 
-        // Calculate total days of stay (excluding checkout day)
-        $checkin_date_obj = new DateTime($checkin_date);
-        $checkout_date_obj = new DateTime($actual_checkout_date);
-        $total_days = $checkin_date_obj->diff($checkout_date_obj)->days;
-
-        // Calculate total room charges
-        $total_room_charges = $room_price * $total_days;
+        // Adjust nightly rate based on discount applied at check-in
+        $adjusted_room_price = max(0, $room_price - $discount);
 
         // Fetch kitchen and bar charges
         $query_kitchen = "SELECT COALESCE(SUM(total_amount), 0) AS kitchen_charges FROM kitchen_orders WHERE guest_id = ? AND status = 'completed'";
@@ -72,12 +60,16 @@ if ($result_room->num_rows > 0) {
 
         // Calculate total charges
         $additional_charges = $kitchen_charges + $bar_charges;
+        $total_room_charges = $adjusted_room_price * $total_days;
         $total_charges = $total_room_charges + $additional_charges;
 
-        // Update booking with the actual checkout date and total charges
-        $update_booking_query = "UPDATE bookings SET checkout_date = ?, total_charges = ? WHERE guest_id = ?";
+        // Final total after discount (no additional subtraction)
+        $final_total_after_discount = $total_charges;
+
+        // Update booking
+        $update_booking_query = "UPDATE bookings SET total_charges = ? WHERE guest_id = ?";
         $stmt_update_booking = $conn->prepare($update_booking_query);
-        $stmt_update_booking->bind_param("sdi", $actual_checkout_date, $total_charges, $guest_id);
+        $stmt_update_booking->bind_param("di", $final_total_after_discount, $guest_id);
 
         if ($stmt_update_booking->execute()) {
             // Update room status
@@ -103,5 +95,4 @@ if ($result_room->num_rows > 0) {
 }
 
 exit();
-
 ?>

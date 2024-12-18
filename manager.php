@@ -1,5 +1,42 @@
 <?php
-require_once 'db_connect.php'; // Include database connection
+session_start();
+
+include('db_connect.php');
+
+if (!isset($_SESSION['username'])) {
+    $_SESSION['msg'] = "You must log in first";
+    header('location: login.php');
+}
+
+if (isset($_GET['logout'])) {
+    session_destroy();
+    unset($_SESSION['username']);
+    header("location: login.php");
+}
+
+require_once 'server.php'; // To include your database connection
+
+// Fetching Kitchen Orders
+$sql_kitchen = "SELECT * FROM kitchen_orders WHERE status = 'completed'"; // Only fetching completed orders
+$result_kitchen = $conn->query($sql_kitchen);
+
+// Fetching Bar Orders
+$sql_bar = "SELECT * FROM bar_orders"; // Adjust this query based on your table and schema
+$result_bar = $conn->query($sql_bar);
+
+
+// Fetch orders marked as 'sent to front desk'
+$query = "SELECT * FROM kitchen_orders WHERE status = 'sent to front desk'";
+$result = $conn->query($query);
+
+// Fetch orders marked as 'sent to front desk' bar
+$query = "SELECT * FROM bar_orders WHERE status = 'sent to front desk'";
+$result = $conn->query($query);
+
+
+
+// Fetch all orders and display them as needed
+
 ?>
 
 <!DOCTYPE html>
@@ -7,8 +44,9 @@ require_once 'db_connect.php'; // Include database connection
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Page - Imprest Requests</title>
-    <link rel="stylesheet" href="manager.css">
+    <title>Antilla Hotel Manager</title>
+    <link rel="stylesheet" href="manager_1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -24,161 +62,86 @@ require_once 'db_connect.php'; // Include database connection
             </a>
 </header>
 
-<main>
-    <h2>Manage Imprest Requests</h2>
+        <!-- Dashboard Content -->
+        <div class="dashboard">
+            <div class="grid-container">
+                <!-- Imprest Section -->
+                <section class="imprest-section">
+                    <h2>Imprest Management</h2>
+                    <div class="column-status">
+                        <div class="header">Check Imprest</div>
+                        <button class="button view-tasks">
+                            <i class="fas fa-tasks"></i> <a href="manager_imprest.php">Hotel Imprest Request</a>
+                        </button>
+                    </div>
+                </section>
 
-    <?php
-    if (isset($_GET['message'])) {
-        if ($_GET['message'] == 'deleted') {
-            echo "<p class='success'>Request deleted successfully!</p>";
-        }
-    }
-    ?>
+                <!-- Service Requests Section -->
+                <section class="Spreadsheet-section">
+                    <h2>Spreadsheet Export</h2>
+                    <div class="column-status">
+                        <div class="header">Export Spreadsheets</div>
+                        <button class="button view-tasks">
+                            <i class="fas fa-tasks"></i> <a href="manager_imprest.php">Click Here</a>
+                        </button>
+                    </div>
+                </section>
 
-    <!-- Date Filter -->
-    <form method="POST" action="">
-        <label for="date">Select Date:</label>
-        <input type="date" id="date" name="date">
-        <button type="submit">Filter</button>
-    </form>
+                <!-- Kitchen Order Section -->
+<section class="kitchen-order">
+    <h2>Kitchen Order - Antilla Apartments & Suites</h2>
+    <table id="kitchen-orders">
+        <tr>
+            <th>Room Number</th>
+            <th>Order Description</th>
+            <th>Total Amount (₦)</th>
+            <th>Status</th>
+            <th>Special Instructions</th>
+        </tr>
+        <?php
+            if ($result_kitchen->num_rows > 0) {
+                while ($order = $result_kitchen->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($order['room_number']) . "</td>";
+                    echo "<td>" . htmlspecialchars($order['order_description']) . "</td>";
+                    echo "<td>" . number_format($order['total_amount'], 2) . "</td>";
+                    echo "<td>" . htmlspecialchars($order['status']) . "</td>";
+                    echo "<td>" . htmlspecialchars($order['special_instructions']) . "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='5'>No kitchen orders available.</td></tr>";
+            }
+            ?>
+    </table>
+</section>
 
-    <!-- Grid Container for Imprest Requests (Kitchen) and (Bar) -->
-    <div class="grid-container">
-        <!-- Kitchen Requests -->
-        <section>
-            <h3>Imprest Requests (Kitchen)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Request Description</th>
-                        <th>Price</th>
-                        <th>Mark as Complete</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $date_filter = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
-                    $sql = "SELECT * FROM imprest_requests WHERE status != 'Completed' AND DATE(timestamp) = '$date_filter'";
-                    $result = mysqli_query($conn, $sql);
 
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>";
-                        echo "<td>{$row['id']}</td>";
-                        echo "<td>{$row['item_name']}</td>";
-                        echo "<td>";
-                        echo "<form method='POST' action='update_price.php'>";
-                        echo "<input type='hidden' name='id' value='{$row['id']}'>";
-                        echo "<input type='text' name='price' value='{$row['price']}' required>";
-                        echo "</td>";
-                        echo "<td>";
-                        echo "<form method='POST' action='complete_request.php'>";
-                        echo "<button type='submit' name='complete' value='{$row['id']}'>Mark as Complete</button>";
-                        echo "</form>";
-                        echo "</td>";
-                        echo "<td>";
-                        echo "<form method='POST' action='delete_request.php'>";
-                        echo "<input type='hidden' name='id' value='{$row['id']}'>";
-                        echo "<button type='submit' name='delete'>Delete</button>";
-                        echo "</form>";
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Bar Requests -->
-        <section>
-            <h3>Imprest Requests (Bar)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Request Description</th>
-                        <th>Price</th>
-                        <th>Mark as Complete</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $sql = "SELECT * FROM imprest_requests_bar WHERE status != 'Completed' AND DATE(timestamp) = '$date_filter'";
-                    $result = mysqli_query($conn, $sql);
-
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>";
-                        echo "<td>{$row['id']}</td>";
-                        echo "<td>{$row['item_name']}</td>";
-                        echo "<td>";
-                        echo "<form method='POST' action='update_price.php'>";
-                        echo "<input type='hidden' name='id' value='{$row['id']}'>";
-                        echo "<input type='text' name='price' value='{$row['price']}' required>";
-                        echo "</td>";
-                        echo "<td>";
-                        echo "<form method='POST' action='complete_request.php'>";
-                        echo "<button type='submit' name='complete' value='{$row['id']}'>Mark as Complete</button>";
-                        echo "</form>";
-                        echo "</td>";
-                        echo "<td>";
-                        echo "<form method='POST' action='delete_request.php'>";
-                        echo "<input type='hidden' name='id' value='{$row['id']}'>";
-                        echo "<button type='submit' name='delete'>Delete</button>";
-                        echo "</form>";
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </section>
+                <!-- Bar Order Section -->
+                <section class="bar-order">
+                    <h2>Bar Order - Antilla Apartments & Suites</h2>
+                    <table id="bar-orders">
+                        <tr>
+                            <th><i class="fas fa-glass-cheers"></i> Room Orders</th>
+                        </tr>
+                        <!-- Data from database will be injected here -->
+                        <?php
+                        if ($result_bar->num_rows > 0) {
+                            while ($order = $result_bar->fetch_assoc()) {
+                                echo "<tr><td>Room " . $order['room_number'] . " - " . $order['order_description'] . " (Status: " . $order['status'] . ")</td></tr>";
+                            }
+                        } else {
+                            echo "<tr><td>No bar orders available.</td></tr>";
+                        }
+                        ?>
+                    </table>
+                </section>
+            </div>
+        </div>
     </div>
 
-    <!-- Completed Imprest Requests Section -->
-    <section class="completed-section">
-        <h3>Completed Imprest Requests</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Request Description</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $sql = "SELECT * FROM imprest_requests WHERE status = 'Completed' AND DATE(timestamp) = '$date_filter'";
-                $result = mysqli_query($conn, $sql);
 
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<tr>";
-                    echo "<td>{$row['id']}</td>";
-                    echo "<td>{$row['item_name']}</td>";
-                    echo "<td>{$row['price']}</td>";
-                    echo "</tr>";
-                }
-
-                $sql2 = "SELECT * FROM imprest_requests_bar WHERE status = 'Completed' AND DATE(timestamp) = '$date_filter'";
-                $result2 = mysqli_query($conn, $sql2);
-
-                while ($row2 = mysqli_fetch_assoc($result2)) {
-                    echo "<tr>";
-                    echo "<td>{$row2['id']}</td>";
-                    echo "<td>{$row2['item_name']}</td>";
-                    echo "<td>{$row2['price']}</td>";
-                    echo "</tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-        <form method="POST" action="export_csv.php">
-            <button type="submit" name="export">Export Completed Requests as CSV</button>
-        </form>
-    </section>
-
-</main>
+    <script src="home.js"></script>
 
 </body>
 </html>
