@@ -64,15 +64,6 @@ $stmt_bar->execute();
 $result_bar = $stmt_bar->get_result();
 $bar_charges = $result_bar->fetch_assoc()['bar_charges'] ?? 0.0;
 
-// Debug values
-var_dump($kitchen_charges);
-var_dump($bar_charges);
-
-// Format for display
-echo number_format(floatval($kitchen_charges), 2);
-echo number_format(floatval($bar_charges), 2);
-
-
 // Calculate additional charges
 $queries = [
     'kitchen_charges' => "SELECT COALESCE(SUM(total_amount), 0) AS total FROM kitchen_orders WHERE guest_id = ? AND status = 'completed'",
@@ -102,6 +93,7 @@ $total_days = $checkin_date_obj->diff($checkout_date_obj)->days;
 
 $total_room_charges = $discounted_price * $total_days;
 $total_charges = $total_room_charges + $additional_charges;
+
 ?>
 
 <!DOCTYPE html>
@@ -110,11 +102,6 @@ $total_charges = $total_room_charges + $additional_charges;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guest Checkout</title>
-    <link rel="stylesheet" href="room.css">
-</head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Receipt</title>
     <link rel="stylesheet" href="room.css">
 </head>
 <body>
@@ -161,10 +148,17 @@ $total_charges = $total_room_charges + $additional_charges;
 
     <label for="total_charges">Total Charges:</label>
     <input type="text" id="total_charges" name="total_charges" value="₦<?php echo number_format($total_charges, 2); ?>" readonly>
+    
+    <input type="hidden" id="total_paid" name="total_paid" value="<?php echo $total_charges; ?>" readonly>
 
     <hr>
+</form>
 
-    <button type="submit" class="button">Complete Checkout</button>
+<form action="complete_checkout.php" method="POST"> <input type="hidden" id="guest_id" name="guest_id" value="<?php echo $guest_id; ?>"> 
+<input type="hidden" id="room_number" name="room_number" value="<?php echo $room_number; ?>"> 
+<input type="hidden" id="total_charges" name="total_charges" value="<?php echo $total_charges; ?>">
+
+<button type="submit" class="button">Complete Checkout</button>
 </form>
         </section>
 

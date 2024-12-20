@@ -24,7 +24,7 @@ $payment_status = isset($_GET['payment_status']) && $_GET['payment_status'] ? $c
 
 // Updated query to search by guest_id, guest_name, room_number, or price
 $query = "
-    SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status, b.price, b.total_charges, b.discount,
+    SELECT b.booking_id, b.guest_name, b.guest_id, b.room_number, b.checkin_date, b.checkout_date, b.payment_status, b.price, b.total_paid, b.discount,
            r.weekday_price, r.weekend_price,
            (SELECT IFNULL(SUM(k.total_amount), 0) 
             FROM kitchen_orders k 
@@ -125,7 +125,7 @@ while ($row = $result->fetch_assoc()) {
             <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
             <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
             <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
-            <td>₦<?php echo number_format($guest['total_charges'], 2); ?></td>
+            <td>₦<?php echo number_format($guest['total_paid'], 2); ?></td>
             <td>₦<?php echo number_format($guest['discount'] ?? 0, 2); ?></td>
  <!-- Display the discount -->
             <td>
