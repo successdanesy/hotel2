@@ -2,46 +2,82 @@
 session_start();
 include('db_connect.php'); // Database connection
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $roomNumber = $data['roomNumber'];
-    $orders = $data['orders'];
-    $specialInstructions = $data['specialInstructions'];
+header('Content-Type: application/json'); // Ensure the response is JSON
 
-    // Fetch the current guest_id for the room
-    $query_guest = "SELECT guest_id FROM rooms WHERE room_number = ?";
-    $stmt_guest = $conn->prepare($query_guest);
-    $stmt_guest->bind_param('i', $roomNumber);
-    $stmt_guest->execute();
-    $result_guest = $stmt_guest->get_result();
-    
-    if ($result_guest->num_rows > 0) {
-        $guest = $result_guest->fetch_assoc();
-        $guestId = $guest['guest_id'];  // Get the current guest_id
-    } else {
-        echo json_encode(['success' => false, 'error' => 'No guest currently assigned to this room.']);
-        exit();
-    }
+try {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Log the raw received data for debugging
+        error_log("Received Data: " . print_r($data, true));
 
-    // Process each order in the tray
-    foreach ($orders as $order) {
-        $menuItemId = $order['menuItemId'];
-        $menuItemText = $order['menuItemText'];
-        $price = $order['price'];
+        $guestType = $data['guestType'] ?? null;
+        $roomNumber = $data['roomNumber'] ?? null;
+        $orders = $data['orders'] ?? [];
+        $specialInstructions = $data['specialInstructions'] ?? '';
+        $guestId = $data['guestId'] ?? null;
 
-        // Insert into bar_orders
-        $query = "INSERT INTO bar_orders (room_number, order_description, status, timestamp, total_amount, special_instructions, guest_id) 
-                  VALUES (?, ?, 'Pending', NOW(), ?, ?, ?)";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param('issds', $roomNumber, $menuItemText, $price, $specialInstructions, $guestId);
+        // Log detailed input data
+        error_log("Guest Type: " . $guestType);
+        error_log("Room Number: " . $roomNumber);
+        error_log("Guest ID: " . $guestId);
+        error_log("Orders: " . print_r($orders, true));
+        error_log("Special Instructions: " . $specialInstructions);
 
-        if (!$stmt->execute()) {
-            echo json_encode(['success' => false, 'error' => 'Failed to add the order.']);
-            exit();
+        if ($guestType === 'guest' && $roomNumber && $guestId) {
+            foreach ($orders as $order) {
+                $menuItemId = $order['menuItemId'] ?? null;
+                $menuItemText = $order['menuItemText'] ?? '';
+                $price = $order['price'] ?? 0;
+
+                if (!$menuItemId || !$menuItemText || $price <= 0) {
+                    throw new Exception('Invalid order details.');
+                }
+
+                error_log("Inserting guest order: $menuItemText for room $roomNumber");
+
+                $query = "INSERT INTO bar_orders (room_number, order_description, status, timestamp, total_amount, special_instructions, guest_id, guest_type) 
+                          VALUES (?, ?, 'Pending', NOW(), ?, ?, ?, ?)";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param('ssdsds', $roomNumber, $menuItemText, $price, $specialInstructions, $guestId, $guestType);
+
+                if (!$stmt->execute()) {
+                    error_log('SQL Error (Guest): ' . $stmt->error); // Log SQL error for guest order
+                    throw new Exception('Failed to add the guest order: ' . $stmt->error);
+                }
+                $stmt->close();
+            }
+        } elseif ($guestType === 'non_guest') {
+            foreach ($orders as $order) {
+                $menuItemId = $order['menuItemId'] ?? null;
+                $menuItemText = $order['menuItemText'] ?? '';
+                $price = $order['price'] ?? 0;
+
+                if (!$menuItemId || !$menuItemText || $price <= 0) {
+                    throw new Exception('Invalid order details.');
+                }
+
+                error_log("Inserting non-guest order: $menuItemText");
+
+                $query = "INSERT INTO bar_orders (order_description, status, timestamp, total_amount, special_instructions, guest_type) 
+                          VALUES (?, 'Pending', NOW(), ?, ?, ?)";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param('sds', $menuItemText, $price, $specialInstructions, $guestType);
+
+                if (!$stmt->execute()) {
+                    error_log('SQL Error (Non-Guest): ' . $stmt->error); // Log SQL error for non-guest order
+                    throw new Exception('Failed to add the non-guest order: ' . $stmt->error);
+                }
+                $stmt->close();
+            }
+        } else {
+            throw new Exception('Invalid input.');
         }
-        $stmt->close();
-    }
 
-    echo json_encode(['success' => true, 'message' => 'Orders submitted successfully!']);
+        echo json_encode(['success' => true, 'message' => 'Orders submitted successfully!']);
+    }
+} catch (Exception $e) {
+    error_log('Exception: ' . $e->getMessage()); // Log the error message to the server log
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
 ?>

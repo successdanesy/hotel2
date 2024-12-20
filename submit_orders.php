@@ -32,6 +32,7 @@ try {
                 $stmt->close();
             }
         } elseif ($guestType === 'non_guest') {
+            
             // Process each order in the tray for a non-guest
             foreach ($orders as $order) {
                 $menuItemId = $order['menuItemId'];
