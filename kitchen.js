@@ -1,3 +1,4 @@
+// Function to fetch Guest ID by Room Number
 function fetchGuestId() {
     const roomNumber = document.getElementById('room_number').value;
 
@@ -27,9 +28,6 @@ function fetchGuestId() {
         });
 }
 
-
-
-
 // Update menu items based on category selection
 document.getElementById('category').addEventListener('change', function () {
     const categoryId = this.value;
@@ -56,13 +54,19 @@ const orderTrayTable = document.getElementById('orderTray').querySelector('tbody
 
 // Add item to the tray
 document.getElementById('addToTray').addEventListener('click', () => {
+    const guestType = document.getElementById('guest_type').value;
     const roomNumber = document.getElementById('room_number').value;
     const menuItemId = document.getElementById('menu_item').value;
     const menuItemText = document.getElementById('menu_item').selectedOptions[0]?.textContent || '';
     const specialInstructions = document.getElementById('special_instructions').value;
 
-    if (!roomNumber || !menuItemId) {
+    if (guestType === 'guest' && (!roomNumber || !menuItemId)) {
         alert('Please select a room and menu item.');
+        return;
+    }
+
+    if (guestType === 'non_guest' && !menuItemId) {
+        alert('Please select a menu item.');
         return;
     }
 
@@ -96,17 +100,19 @@ document.getElementById('submitOrders').addEventListener('click', () => {
         return;
     }
 
+    const guestType = document.getElementById('guest_type').value;
     const guestId = document.getElementById('guest_id').value;
     const roomNumber = document.getElementById('room_number').value;
 
-    if (!guestId || !roomNumber) {
+    if (guestType === 'guest' && (!guestId || !roomNumber)) {
         alert('Please ensure both guest ID and room number are selected.');
         return;
     }
 
     const orderData = {
-        roomNumber,
-        guestId,
+        guestType,
+        roomNumber: guestType === 'guest' ? roomNumber : null,
+        guestId: guestType === 'guest' ? guestId : null,
         orders: orderTray,
         specialInstructions: document.getElementById('special_instructions').value
     };
@@ -203,8 +209,6 @@ function clearAllOrders() {
     updateOrderSummary();
 }
 
-
-
 function loadDynamicContent() {
     // Your dynamic content loading logic here
     // After content is loaded, attach the event listener:
@@ -214,14 +218,9 @@ function loadDynamicContent() {
         clearButton.addEventListener('click', clearAllOrders);
     }
 }
+
 // Call this function after the content is dynamically added
 loadDynamicContent();
-
-//old code
-// document.getElementById('clearAllOrdersButton').addEventListener('click', clearAllOrders);
-
-
-
 
 // Confirm Order and Send to Front Desk
 function confirmOrder() {
