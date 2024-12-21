@@ -111,14 +111,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_completed'])) {
     }
 }
 
-// Fetch all orders
-function fetchOrders($conn) {
-    $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp 
-              FROM kitchen_orders ORDER BY timestamp DESC";
-    return $conn->query($query)->fetch_all(MYSQLI_ASSOC);
+// Get the selected date from the form submission or default to today's date
+$selected_date = isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d');
+
+// Verify that the date is properly formatted
+if (DateTime::createFromFormat('Y-m-d', $selected_date) === false) {
+    $selected_date = date('Y-m-d'); // Fallback to today's date if the format is incorrect
 }
 
-$orders = fetchOrders($conn);
+// Fetch orders based on the selected date
+function fetchOrders($conn, $selected_date) {
+    $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp 
+              FROM kitchen_orders 
+              WHERE DATE(timestamp) = ? 
+              ORDER BY timestamp DESC";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $selected_date);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+$orders = fetchOrders($conn, $selected_date);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -144,7 +158,6 @@ $orders = fetchOrders($conn);
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </header>
-    
     
 <form id="orderForm" method="POST" action="kitchen.php">
     <!-- Guest Type Selection -->
@@ -191,7 +204,7 @@ $orders = fetchOrders($conn);
         <label for="menu_item">Menu Item:</label>
         <select id="menu_item" required>
             <option value="">-- Select Menu Item --</option>
-        </select>
+            </select>
     </div>
 
     <div>
@@ -218,6 +231,13 @@ $orders = fetchOrders($conn);
 </table>
 <button id="submitOrders" type="button">Submit Orders</button>
 
+<!-- Date Filter Form -->
+<form method="GET" action="kitchen.php" class="filter-form">
+    <label for="selected_date">Select Date:</label>
+    <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
+    <button type="submit" class="button">Filter</button>
+</form>
+
 <!-- Orders Table -->
 <table>
     <thead>
@@ -226,42 +246,80 @@ $orders = fetchOrders($conn);
             <th>Room</th>
             <th>Order</th>
             <th>Price (₦)</th>
-                <th>Instructions</th>
-                <th>Status</th>
-                <th>Actions</th>
+            <th>Instructions</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($orders as $order): ?>
+            <tr>
+                <td><?= $order['id'] ?></td>
+                <td><?= htmlspecialchars($order['room_number']) ?></td>
+                <td><?= htmlspecialchars($order['order_description']) ?></td>
+                <td><?= number_format($order['total_amount'], 2) ?></td>
+                <td><?= htmlspecialchars($order['special_instructions']) ?></td>
+                <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
+                <td>
+                    <?php if ($order['status'] !== 'Completed'): ?>
+                        <button onclick="markAsComplete(<?= $order['id'] ?>)" id="mark-completed-btn-<?= $order['id'] ?>">Mark Completed</button>
+                    <?php else: ?>
+                        <button disabled>Completed</button>
+                    <?php endif; ?>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($orders as $order): ?>
-                <tr>
-                    <td><?= $order['id'] ?></td>
-                    <td><?= htmlspecialchars($order['room_number']) ?></td>
-                    <td><?= htmlspecialchars($order['order_description']) ?></td>
-                    <td><?= number_format($order['total_amount'], 2) ?></td>
-                    <td><?= htmlspecialchars($order['special_instructions']) ?></td>
-                    <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
-                    <td>
-                        <?php if ($order['status'] !== 'Completed'): ?>
-                            <button onclick="markAsComplete(<?= $order['id'] ?>)" id="mark-completed-btn-<?= $order['id'] ?>">Mark Completed</button>
-                        <?php else: ?>
-                            <button disabled>Completed</button>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-    
-    <script>
-        const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
+        <?php endforeach; ?>
+    </tbody>
+</table>
 
-        function toggleGuestFields() {
-            var guestType = document.getElementById("guest_type").value;
-            var guestFields = document.getElementById("guest_fields");
-            guestFields.style.display = (guestType === "guest") ? "block" : "none";
+</div>
+
+<script>
+    const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
+
+    function toggleGuestFields() {
+        var guestType = document.getElementById("guest_type").value;
+        var guestFields = document.getElementById("guest_fields");
+        guestFields.style.display = (guestType === "guest") ? "block" : "none";
+    }
+
+    document.getElementById('category').addEventListener('change', function() {
+        var categoryId = this.value;
+        var menuItemSelect = document.getElementById('menu_item');
+        menuItemSelect.innerHTML = '<option value="">-- Select Menu Item --</option>';
+        
+        if (categoryId && menuItemsByCategory[categoryId]) {
+            menuItemsByCategory[categoryId].forEach(function(item) {
+                var option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name + ' - ₦' + item.price;
+                menuItemSelect.appendChild(option);
+            });
         }
-    </script>
-    
-    <script src="kitchen.js"></script>
+    });
+
+    function markAsComplete(orderId) {
+        $.ajax({
+            url: 'kitchen.php',
+            type: 'POST',
+            data: {
+                mark_completed: true,
+                order_id: orderId
+            },
+            success: function(response) {
+                var result = JSON.parse(response);
+                if (result.status === 'Completed') {
+                    document.getElementById('status-' + orderId).textContent = 'Completed';
+                    document.getElementById('mark-completed-btn-' + orderId).disabled = true;
+                }
+            }
+        });
+    }
+
+    // Initial call to set guest fields visibility
+    toggleGuestFields();
+</script>
+
+<script src="kitchen.js"></script>
 </body>
 </html>
