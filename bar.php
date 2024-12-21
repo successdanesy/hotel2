@@ -111,14 +111,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_completed'])) {
     }
 }
 
-// Fetch all orders
-function fetchOrders($conn) {
-    $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp 
-              FROM bar_orders ORDER BY timestamp DESC";
-    return $conn->query($query)->fetch_all(MYSQLI_ASSOC);
+// Get the selected date from the form submission or default to today's date
+$selected_date = isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d');
+
+// Verify that the date is properly formatted
+if (DateTime::createFromFormat('Y-m-d', $selected_date) === false) {
+    $selected_date = date('Y-m-d'); // Fallback to today's date if the format is incorrect
 }
 
-$orders = fetchOrders($conn);
+// Fetch orders based on the selected date
+function fetchOrders($conn, $selected_date) {
+    $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp 
+              FROM bar_orders 
+              WHERE DATE(timestamp) = ? 
+              ORDER BY timestamp DESC";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $selected_date);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+$orders = fetchOrders($conn, $selected_date);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -214,6 +228,12 @@ $orders = fetchOrders($conn);
     </tbody>
 </table>
 <button id="submitOrders" type="button">Submit Orders</button>
+<!-- Date Filter Form -->
+<form method="GET" action="bar.php" class="filter-form">
+    <label for="selected_date">Select Date:</label>
+    <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
+    <button type="submit" class="button">Filter</button>
+</form>
 
     <table>
         <thead>
@@ -256,9 +276,46 @@ $orders = fetchOrders($conn);
             var guestFields = document.getElementById("guest_fields");
             guestFields.style.display = (guestType === "guest") ? "block" : "none";
         }
+
+        document.getElementById('category').addEventListener('change', function() {
+            var categoryId = this.value;
+            var menuItemSelect = document.getElementById('menu_item');
+            menuItemSelect.innerHTML = '<option value="">-- Select Menu Item --</option>';
+            
+            if (categoryId && menuItemsByCategory[categoryId]) {
+                menuItemsByCategory[categoryId].forEach(function(item) {
+                    var option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = item.name + ' - ₦' + item.price;
+                    menuItemSelect.appendChild(option);
+                });
+            }
+        });
+
+        function markAsComplete(orderId) {
+            $.ajax({
+                url: 'bar.php',
+                type: 'POST',
+                data: {
+                    mark_completed: true,
+                    order_id: orderId
+                },
+                success: function(response) {
+                    var result = JSON.parse(response);
+                    if (result.status === 'Completed') {
+                        document.getElementById('status-' + orderId).textContent = 'Completed';
+                        document.getElementById('mark-completed-btn-' + orderId).disabled = true;
+                    }
+                }
+            });
+        }
+
+        // Initial call to set guest fields visibility
+        toggleGuestFields();
     </script>
     
     <script src="bar.js"></script>
+</div>
 </body>
 </html>
 
