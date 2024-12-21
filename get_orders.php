@@ -1,35 +1,45 @@
 <?php
-include('db_connect.php');
-// Correctly including db_connect.php
+include('db_connect.php'); // Include database connection
 
-// Fetching Kitchen Orders
-$sql_kitchen = "SELECT * FROM kitchen_orders";
-$result_kitchen = $conn->query($sql_kitchen);
+// Get the selected date from the request, default to today's date
+$selected_date = isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d');
 
-// Fetching Bar Orders
-$sql_bar = "SELECT * FROM bar_orders";
-$result_bar = $conn->query($sql_bar);
+// Fetching Kitchen Orders based on the selected date
+$sql_kitchen = "SELECT * FROM kitchen_orders WHERE DATE(timestamp) = ?";
+$stmt_kitchen = $conn->prepare($sql_kitchen);
+$stmt_kitchen->bind_param("s", $selected_date);
+$stmt_kitchen->execute();
+$result_kitchen = $stmt_kitchen->get_result();
 
-// Creating an array to hold the orders
-$orders = [
+// Fetching Bar Orders based on the selected date
+$sql_bar = "SELECT * FROM bar_orders WHERE DATE(timestamp) = ?";
+$stmt_bar = $conn->prepare($sql_bar);
+$stmt_bar->bind_param("s", $selected_date);
+$stmt_bar->execute();
+$result_bar = $stmt_bar->get_result();
+
+// Prepare the response
+$response = [
     'kitchen' => [],
     'bar' => []
 ];
 
-// Kitchen orders
-if ($result_kitchen->num_rows > 0) {
-    while ($order = $result_kitchen->fetch_assoc()) {
-        $orders['kitchen'][] = $order;
-    }
+while ($order = $result_kitchen->fetch_assoc()) {
+    $response['kitchen'][] = $order;
 }
 
-// Bar orders
-if ($result_bar->num_rows > 0) {
-    while ($order = $result_bar->fetch_assoc()) {
-        $orders['bar'][] = $order;
-    }
+while ($order = $result_bar->fetch_assoc()) {
+    $response['bar'][] = $order;
 }
 
-// Returning the data as JSON
-echo json_encode($orders);
+// Debugging: Log the response before encoding it to JSON
+error_log("Response Data: " . print_r($response, true));
+
+// Return the JSON response
+header('Content-Type: application/json');
+echo json_encode($response);
+
+$stmt_kitchen->close();
+$stmt_bar->close();
+$conn->close();
 ?>

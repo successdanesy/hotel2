@@ -12,12 +12,15 @@ $specialInstructions = $data['specialInstructions']; // Special instructions
 // Default status for new orders
 $status = 'Pending';
 
+// Current timestamp
+$timestamp = date('Y-m-d H:i:s');
+
 // Insert order into the kitchen_orders table
-$query = "INSERT INTO kitchen_orders (room_number, order_description, status, total_amount, special_instructions) VALUES (?, ?, ?, ?, ?)";
+$query = "INSERT INTO kitchen_orders (room_number, order_description, status, total_amount, special_instructions, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($query);
 
-// Bind parameters: room_number (string), orders (JSON), status (string), total_amount (float), special_instructions (string)
-$stmt->bind_param("sssss", $roomNumber, json_encode($orders), $status, $totalAmount, $specialInstructions);
+// Bind parameters: room_number (string), orders (JSON), status (string), total_amount (float), special_instructions (string), timestamp (datetime)
+$stmt->bind_param("ssssss", $roomNumber, json_encode($orders), $status, $totalAmount, $specialInstructions, $timestamp);
 
 $stmt->execute();
 
