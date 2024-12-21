@@ -17,7 +17,7 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    background-color: #007bff;
+    background-color: #900c3f; /* Dark red for header background */
     padding: 10px 20px;
     border-radius: 8px;
     color: white;
@@ -40,7 +40,7 @@ header .button {
     align-items: center;
     text-decoration: none;
     color: white;
-    background-color: #007bff;
+    background-color: #c70039; /* Red background for buttons */
     padding: 8px 16px;
     border-radius: 4px;
     transition: background-color 0.3s ease;
@@ -53,17 +53,21 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #0056b3;
+    background-color: #900c3f; /* Darker red for hover state */
 }
 
 header .welcome {
     font-size: 16px;
     display: flex;
     align-items: center;
+    background-color: #f4d03f; /* Gold background for welcome section */
+    padding: 10px;
+    border-radius: 4px;
 }
 
 header .welcome i {
     margin-right: 5px;
+    color: #000; /* Black color for icons */
 }
 
 /* Main container */
@@ -74,14 +78,16 @@ header .welcome i {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid #000; /* Black border for sections */
+    
 }
 
 /* Section titles */
 h2 {
     font-size: 1.5rem;
-    color: #007bff;
+    color: #c70039; /* Red color for section titles */
     margin-bottom: 10px;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid #f4d03f; /* Gold underline for section titles */
     padding-bottom: 5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
@@ -96,7 +102,7 @@ table {
 th {
     position: sticky;
     top: 0;
-    background-color: #007bff;
+    background-color: #c70039; /* Red background for table headers */
     color: white;
     padding: 8px;
     z-index: 10;
@@ -120,7 +126,7 @@ table tr:hover {
 /* General Button Styles */
 button {
     display: inline-block;
-    color: white;
+    background-color: #c0392b;
     padding: 8px 16px;
     border-radius: 4px;
     border: none;
@@ -165,10 +171,6 @@ form .checkout-btn:hover {
     transform: translateY(-3px);
 }
 
-
-
-
-
 /* Form styles */
 form {
     margin-bottom: 20px;
@@ -204,11 +206,11 @@ form button {
 }
 
 .status.available {
-    background-color: #4CAF50;
+    background-color: #4CAF50; /* Green */
 }
 
 .status.taken {
-    background-color: #e53935;
+    background-color: #e53935; /* Red */
 }
 
 /* Showing messages */
@@ -240,7 +242,7 @@ form button {
 .add-room-link .button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #ffc107;
+    background-color: #ffc107; /* Gold */
     font-size: 1rem;
     text-align: center;
     transition: transform 0.3s ease, background-color 0.3s ease;
@@ -248,7 +250,7 @@ form button {
 
 .add-room-link .button:hover {
     transform: translateY(-3px);
-    background-color: #218838;
+    background-color: #218838; /* Darker green */
 }
 
 /* Back to Room Management Button */
@@ -259,59 +261,58 @@ form button {
 }
 
 .back-to-room-management .button {
-    background-color: #ffc107;
+    background-color: #ffc107; /* Gold */
     font-size: 1rem;
     padding: 8px 16px;
 }
 
 .back-to-room-management .button:hover {
-    background-color: #e0a800;
+    background-color: #e0a800; /* Darker gold */
 }
-
-.button {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: white;
-    background-color: #007bff;
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .button i {
-    margin-right: 5px;
-  }
-  
-  .button:hover {
-    background-color: #0056b3;
-  }
-  
-  .button.new-guest {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    text-align: center;
-    border-radius: 5px;
-    text-decoration: none;
-}
-
-.button.new-guest:hover {
-    background-color: #0056b3;
-}
-
 
 /* Footer */
 footer {
     text-align: center;
     padding: 15px;
     margin-top: 20px;
-    background-color: #007bff;
+    background-color: #900c3f; /* Dark red for footer background */
     color: white;
     border-radius: 8px;
     font-size: 0.9rem;
+}
+
+/* Media Queries for Tablets */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        padding-bottom: 3px;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    .add-room-link .button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    footer {
+        font-size: 0.8rem;
+        padding: 10px;
+    }
 }

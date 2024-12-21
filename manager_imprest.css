@@ -1,0 +1,271 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #900c3f; /* Dark red for header background */
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+header .welcome {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+header .welcome i {
+    color: #000; /* Black color for icons */
+}
+
+/* Main Content */
+main {
+    margin-top: 20px;
+    width: 100%;
+    overflow-x: auto;
+}
+
+main h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #c70039; /* Red color for headings */
+}
+
+/* Success Message */
+.success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Form */
+form {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+form label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+form input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+form button {
+    padding: 10px 15px;
+    background-color: #28a745; /* Green background for buttons */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+/* Grid Layout */
+.grid-container {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 20px;
+    width: 100%;
+    overflow-x: auto;
+}
+
+section {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+section h3 {
+    font-size: 1.5rem;
+    color: #c70039; /* Red color for section headers */
+    margin-bottom: 15px;
+    border-bottom: 2px solid #f4d03f; /* Gold underline for section headers */
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+table th {
+    font-weight: 600;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Buttons in Tables */
+table button {
+    padding: 8px 12px;
+    background-color: #c70039; /* Red background for table buttons */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+table button:hover {
+    background-color: #900c3f; /* Darker red for hover state */
+    transform: translateY(-2px);
+}
+
+/* Completed Section */
+.completed-section {
+    grid-column: span 2;
+}
+
+.completed-section h3 {
+    color: #28a745;
+}
+
+.completed-section button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #17a2b8; /* Blue background for buttons */
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.completed-section button:hover {
+    background-color: #138496;
+    transform: translateY(-2px);
+}
+
+/* Button */
+.button {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    background-color: #c70039; /* Red background for buttons */
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.button i {
+    margin-right: 5px;
+}
+
+.button:hover {
+    background-color: #900c3f; /* Darker red for hover state */
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #900c3f; /* Dark red for footer background */
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+/* Media Queries for Tablets */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    main {
+        padding: 10px;
+        width: 100%;
+    }
+
+    .grid-container {
+        grid-template-columns: 1fr;
+        overflow-x: auto;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+        padding-bottom: 3px;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    footer {
+        font-size: 0.8rem;
+        padding: 10px;
+    }
+}

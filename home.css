@@ -109,7 +109,6 @@ header {
   font-size: 16px;
   display: flex;
   align-items: center;
-  /* background-color: #f4d03f; Gold background for welcome section */
   padding: 10px;
   border-radius: 4px;
 }
@@ -222,16 +221,6 @@ table td {
   border: 1px solid #ddd;
 }
 
-/* Footer */
-footer {
-  text-align: center;
-  padding: 15px;
-  margin-top: 20px;
-  background-color: #900c3f; /* Dark red for footer background */
-  color: white;
-  border-radius: 8px;
-  font-size: 0.9rem;
-}
 
 /* Media Queries for Tablets */
 @media (max-width: 768px) {
@@ -248,8 +237,8 @@ footer {
       margin-top: 10px;
   }
 
-  footer {
+  /* footer {
     font-size: 0.8rem;
     padding: 10px;
-}
+  } */
 }

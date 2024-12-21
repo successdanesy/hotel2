@@ -169,5 +169,10 @@ $stmt_bar->close();
 
 <script src="home.js"></script>
 
+<!-- Footer Section 
+<footer>
+    <p>&copy; 2024 Antilla Apartments & Suites. All rights reserved.</p>
+</footer> -->
+
 </body>
 </html>

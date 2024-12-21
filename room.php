@@ -138,12 +138,12 @@ while ($row = $result->fetch_assoc()) {
     </div>
     
       <!-- Link to Create Room Page -->
-      <section class="add-room-link">
+      <!-- <section class="add-room-link">
             <h2>Add a New Room</h2>
             <form action="create_room.php" method="GET">
                 <button type="submit" class="button">Go to Add Room Page</button>
             </form>
-        </section>
+        </section> -->
 </body>
 
 <!-- Footer Section -->

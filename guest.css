@@ -4,18 +4,19 @@ body {
     padding: 20px;
     background: linear-gradient(to bottom, #f4f4f9, #e8ecf0);
     color: #333;
-    width: 100%; /* Ensure body takes full width */
-    box-sizing: border-box; /* To include padding/border in the element's width/height calculation */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .main-content {
     padding: 20px;
-    width: 100%; /* Allow the content to span the full width of the page */
-    max-width: 100%; /* Remove the max-width limitation */
+    width: 100%;
+    max-width: 100%;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box; /* Ensure padding is included in width */
+    box-sizing: border-box;
+    overflow-x: auto; /* Ensure content is scrollable if it overflows horizontally */
 }
 
 /* Header styling */
@@ -24,7 +25,7 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    background-color: #007bff;
+    background-color: #900c3f;
     padding: 10px 20px;
     border-radius: 8px;
     color: white;
@@ -40,7 +41,7 @@ header .button {
     align-items: center;
     text-decoration: none;
     color: white;
-    background-color: #007bff;
+    background-color: #c70039;
     padding: 8px 16px;
     border-radius: 4px;
     transition: background-color 0.3s ease;
@@ -53,20 +54,23 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #0056b3;
+    background-color: #900c3f;
 }
 
 header p {
     font-size: 16px;
     display: flex;
     align-items: center;
+    padding: 10px;
+    border-radius: 4px;
 }
 
+/* Search form */
 .search-form {
     margin-bottom: 20px;
     display: flex;
     gap: 10px;
-    flex-wrap: wrap; /* Ensure the form doesn't overflow */
+    flex-wrap: wrap;
 }
 
 .search-form input,
@@ -75,21 +79,27 @@ header p {
     font-size: 14px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    flex: 1 1 200px; /* Allow flexibility on smaller screens */
+    flex: 1 1 200px;
 }
 
 .search-form button {
     padding: 8px 12px;
     text-decoration: none;
     color: #fff;
-    background: #007bff;
+    background: #c70039;
     border-radius: 5px;
     font-size: 14px;
     cursor: pointer;
+    border: none;
 }
 
 .search-form button:hover {
-    background: #0056b3;
+    background: #900c3f;
+}
+
+/* Table styling */
+.guest-list {
+    overflow-x: auto; /* Make sure the table is scrollable if it overflows */
 }
 
 table {
@@ -105,25 +115,33 @@ table th, table td {
 }
 
 table th {
-    background-color: #f4f4f4;
+    background-color: #c70039;
+    color: white;
 }
 
 table tr:hover {
-    background-color: #f0f0f0; /* Highlight on hover */
+    background-color: #f0f0f0;
 }
 
+table td {
+    word-wrap: break-word;
+    white-space: nowrap; /* Ensure content stays in a single line to prevent overflow */
+}
+
+/* Button styling */
 button {
     padding: 8px 12px;
     text-decoration: none;
     color: #fff;
-    background: #007bff;
+    background: #c70039;
     border-radius: 5px;
     font-size: 14px;
     cursor: pointer;
+    border: none;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #900c3f;
 }
 
 .pagination {
@@ -135,13 +153,13 @@ button:hover {
     padding: 5px 10px;
     margin: 0 5px;
     text-decoration: none;
-    color: #007bff;
+    color: #c70039;
     border: 1px solid #ddd;
     border-radius: 5px;
 }
 
 .pagination .page-link.active {
-    background: #007bff;
+    background: #c70039;
     color: #fff;
 }
 
@@ -149,15 +167,15 @@ footer {
     text-align: center;
     padding: 15px;
     margin-top: 20px;
-    background-color: #007bff;
+    background-color: #900c3f;
     color: white;
     border-radius: 8px;
     font-size: 0.9rem;
-    width: 100%; /* Ensure footer spans the full width */
+    width: 100%;
 }
 
+/* Media Queries for Tablets */
 @media screen and (max-width: 768px) {
-    /* Adjust header and button styles for smaller screens */
     header {
         flex-direction: column;
         text-align: center;
@@ -174,7 +192,7 @@ footer {
     .search-form input,
     .search-form select,
     .search-form button {
-        width: 100%; /* Full width inputs on smaller screens */
+        width: 100%;
     }
 
     .main-content {
@@ -183,24 +201,24 @@ footer {
     }
 }
 
-    .button {
-        display: inline-block;
-        padding: 8px 12px;
-        background-color: #007bff;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-    }
+/* Button styling for smaller screens */
+.button {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #c70039;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
 
-    .button:hover {
-        background-color: #0056b3;
-    }
+.button:hover {
+    background-color: #900c3f;
+}
 
-
+/* Media Queries for Mobile Devices */
 @media screen and (max-width: 480px) {
-    /* Adjust text sizes for mobile devices */
     header h1 {
         font-size: 1.5rem;
     }

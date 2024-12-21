@@ -8,7 +8,7 @@ require_once 'db_connect.php'; // Include database connection
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Page - Imprest Requests</title>
-    <link rel="stylesheet" href="manager.css">
+    <link rel="stylesheet" href="manager_imprest.css">
 </head>
 <body>
 
@@ -179,6 +179,11 @@ require_once 'db_connect.php'; // Include database connection
     </section>
 
 </main>
+
+<!-- Footer Section  -->
+<footer>
+    <p>&copy; 2024 Antilla Apartments & Suites. All rights reserved.</p>
+</footer>
 
 </body>
 </html>
