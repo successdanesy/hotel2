@@ -36,16 +36,13 @@ header .search-bar {
 }
 
 header .button {
-    display: flex;
-    align-items: center;
+    background-color: #f4d03f; /* Gold for back button */
+    color: #900c3f; /* Dark red for button text */
     text-decoration: none;
-    color: white;
-    background-color: #c70039; /* Red background for buttons */
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    border: none;
-    cursor: pointer;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 header .button i {

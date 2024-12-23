@@ -72,8 +72,8 @@ body {
 .login-btn {
   width: 100%;
   padding: 12px;
-  background-color: #c70039; /* Red background for login button */
-  color: #fff;
+  background-color: #f4d03f; /* Gold for back button */
+  color: #900c3f; /* Dark red for button text */
   font-size: 16px;
   border: none;
   border-radius: 5px;

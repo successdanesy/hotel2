@@ -119,18 +119,13 @@ body {
 }
 
 .button {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #c70039; /* Red for button background */
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
+    background-color: #f4d03f; /* Gold for back button */
+    color: #900c3f; /* Dark red for button text */
     text-decoration: none;
+    font-size: 14px;
+    padding: 8px 12px;
     border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
 }
 
 .button:hover {

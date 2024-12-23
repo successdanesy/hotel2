@@ -36,14 +36,13 @@ form input[type="date"] {
 }
 
 form button {
-  padding: 10px 15px;
-  background-color: #28a745; /* Green background for buttons */
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #f4d03f; /* Gold for back button */
+    color: #900c3f; /* Dark red for button text */
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 form button:hover {
@@ -70,16 +69,13 @@ header {
 }
 
 .button {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: white;
-  background-color: #c70039; /* Red background for buttons */
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-  border: none;
-  cursor: pointer;
+  background-color: #f4d03f; /* Gold for back button */
+    color: #900c3f; /* Dark red for button text */
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 .button i {
@@ -91,14 +87,13 @@ header {
 }
 
 .button.new-guest {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #c70039; /* Red background for new guest button */
-  color: white;
-  font-size: 16px;
-  text-align: center;
-  border-radius: 5px;
-  text-decoration: none;
+  background-color: #f4d03f; /* Gold for back button */
+    color: #900c3f; /* Dark red for button text */
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 .button.new-guest:hover {
@@ -173,8 +168,13 @@ th i {
 }
 
 .view-tasks a, .view-schedule a {
-  text-decoration: none;
-  color: white;
+  background-color: #f4d03f; /* Gold for back button */
+    color: #900c3f; /* Dark red for button text */
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 table tr:nth-child(even) {
