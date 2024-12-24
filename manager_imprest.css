@@ -81,11 +81,15 @@ form label {
     color: #333;
 }
 
-form input[type="date"] {
+form input[type="date"],
+form input[type="text"],
+form input[type="number"] {
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
+    width: 100%; /* Full width for inputs */
+    max-width: 300px; /* Maximum width */
 }
 
 form button {

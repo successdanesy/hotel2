@@ -7,7 +7,7 @@ if (isset($_POST['export'])) {
     $result = mysqli_query($conn, $sql);
 
     header('Content-Type: text/csv');
-    header('Content-Disposition: attachment;filename=completed_imprest_requests.csv');
+    header('Content-Disposition: attachment;filename=completed_imprest_expense(bar/kitchen).csv');
 
     $output = fopen('php://output', 'w');
     fputcsv($output, array('ID', 'Request Description', 'Amount'));

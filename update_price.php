@@ -11,14 +11,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Ensure the price is a numeric value
         if (is_numeric($price_clean)) {
-            // Update status to Completed and insert price
+            // Update status to Completed and insert price for each table
             $sql1 = "UPDATE imprest_requests SET status='Completed', price='$price_clean' WHERE id='$id'";
             $result1 = mysqli_query($conn, $sql1);
 
             $sql2 = "UPDATE imprest_requests_bar SET status='Completed', price='$price_clean' WHERE id='$id'";
             $result2 = mysqli_query($conn, $sql2);
 
-            if ($result1 && $result2) {
+            $sql3 = "UPDATE other_imprests SET status='Completed', price='$price_clean' WHERE id='$id'";
+            $result3 = mysqli_query($conn, $sql3);
+
+            if ($result1 || $result2 || $result3) {
                 header('Location: manager_imprest.php');
                 exit();
             } else {
