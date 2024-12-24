@@ -25,13 +25,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_request'])) {
     }
 }
 
-// Fetch all imprest requests
-function fetchRequests($conn) {
-    $query = "SELECT id, item_name, quantity, price, status, timestamp FROM imprest_requests ORDER BY timestamp DESC";
-    return $conn->query($query)->fetch_all(MYSQLI_ASSOC);
+// Get the selected date from the form submission or default to today's date
+$selected_date = isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d');
+
+// Verify that the date is properly formatted
+if (DateTime::createFromFormat('Y-m-d', $selected_date) === false) {
+    $selected_date = date('Y-m-d'); // Fallback to today's date if the format is incorrect
 }
 
-$requests = fetchRequests($conn);
+// Fetch imprest requests based on the selected date
+function fetchRequests($conn, $selected_date) {
+    $query = "SELECT id, item_name, quantity, price, status, timestamp FROM imprest_requests 
+              WHERE DATE(timestamp) = ? ORDER BY timestamp DESC";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $selected_date);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+$requests = fetchRequests($conn, $selected_date);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,7 +59,6 @@ $requests = fetchRequests($conn);
     <header>
     <h1>Kitchen Imprest Requests</h1>
         <a href="kitchen.php" class="button">Back to Kitchen</a>
-
         <a href="logout.php" class="button">Logout</a>
     </header>
 
@@ -57,10 +69,17 @@ $requests = fetchRequests($conn);
         <label for="quantity">Quantity:</label>
         <input type="text" name="quantity" id="quantity" required>
 
-        <label for="price">Price (₦):</label>
-        <input type="number" name="price" id="price" step="0.01">
+        <!-- <label for="price">Price (₦):</label>
+        <input type="number" name="price" id="price" step="0.01"> -->
 
         <button type="submit" name="submit_request">Submit Request</button>
+    </form>
+
+    <!-- Date Filter Form -->
+    <form method="GET" action="imprest_request.php" class="filter-form">
+        <label for="selected_date">Select Date:</label>
+        <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
+        <button type="submit" class="button">Filter</button>
     </form>
 
     <table>
