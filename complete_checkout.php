@@ -6,6 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $guest_id = intval($_POST['guest_id']);
     $room_number = intval($_POST['room_number']);
     $total_charges = floatval($_POST['total_charges']);
+    $total_room_charges = floatval($_POST['total_room_charges']);
 
     // Start a transaction
     $conn->begin_transaction();
@@ -15,6 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update_booking_query = "UPDATE bookings SET total_paid = ? WHERE guest_id = ?";
         $stmt_update_booking = $conn->prepare($update_booking_query);
         $stmt_update_booking->bind_param("di", $total_charges, $guest_id);
+
+        if (!$stmt_update_booking->execute()) {
+            throw new Exception("Error updating booking: " . $stmt_update_booking->error);
+        } else {
+            error_log("Booking updated successfully.");
+        }
+
+        // Insert or update total_room_charges in the bookings table
+        $update_booking_query = "UPDATE bookings SET total_room_charges = ? WHERE guest_id = ?";
+        $stmt_update_booking = $conn->prepare($update_booking_query);
+        $stmt_update_booking->bind_param("di", $total_room_charges, $guest_id);
 
         if (!$stmt_update_booking->execute()) {
             throw new Exception("Error updating booking: " . $stmt_update_booking->error);

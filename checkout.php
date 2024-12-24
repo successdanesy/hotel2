@@ -150,6 +150,8 @@ $total_charges = $total_room_charges + $additional_charges;
     <input type="text" id="total_charges" name="total_charges" value="₦<?php echo number_format($total_charges, 2); ?>" readonly>
     
     <input type="hidden" id="total_paid" name="total_paid" value="<?php echo $total_charges; ?>" readonly>
+    <input type="hidden" id="total_room_charges" name="total_room_charges" value="<?php echo $total_room_charges; ?>" readonly>
+
 
     <hr>
 </form>
@@ -157,6 +159,7 @@ $total_charges = $total_room_charges + $additional_charges;
 <form action="complete_checkout.php" method="POST"> <input type="hidden" id="guest_id" name="guest_id" value="<?php echo $guest_id; ?>"> 
 <input type="hidden" id="room_number" name="room_number" value="<?php echo $room_number; ?>"> 
 <input type="hidden" id="total_charges" name="total_charges" value="<?php echo $total_charges; ?>">
+<input type="hidden" id="total_room_charges" name="total_room_charges" value="<?php echo $total_room_charges; ?>">
 
 <button type="submit" class="button">Complete Checkout</button>
 </form>
