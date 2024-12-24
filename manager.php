@@ -101,7 +101,7 @@ $stmt_bar->close();
             <div class="room-status">
                 <div class="rooms-header">Export Spreadsheets</div>
                 <button class="button view-tasks">
-                    <i class="fas fa-tasks"></i> <a href="manager_imprest.php">Click Here</a>
+                    <i class="fas fa-tasks"></i> <a href="income.php">Click Here</a>
                 </button>
             </div>
         </section>
