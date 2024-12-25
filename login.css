@@ -81,7 +81,7 @@ body {
 }
 
 .login-btn:hover {
-  background-color: #900c3f; /* Darker red for hover state */
+  background-color: #ffcc00; /* Darker red for hover state */
 }
 
 .error {

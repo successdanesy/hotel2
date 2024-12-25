@@ -78,7 +78,7 @@ $stmt_bar->close();
 <form method="GET" action="manager.php" class="filter-form">
     <label for="selected_date">Select Date:</label>
     <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-    <button type="submit" class="button">Filter</button>
+    <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter</button>
 </form>
 
 <!-- Dashboard Content -->
@@ -101,11 +101,11 @@ $stmt_bar->close();
             <div class="room-status">
                 <div class="rooms-header">Income Spreadsheets</div>
                 <button class="button view-tasks">
-                    <i class="fas fa-tasks"></i> <a href="income.php">Click Here</a>
+                <i class="fa-solid fa-table"></i></i> <a href="income.php">Click Here</a>
                 </button>
                 <div class="rooms-header">Expense Spreadsheets</div>
                 <button class="button view-tasks">
-                    <i class="fas fa-tasks"></i> <a href="expense.php">Click Here</a>
+                <i class="fa-solid fa-table"></i> <a href="expense.php">Click Here</a>
                 </button>
             </div>
         </section>

@@ -48,7 +48,7 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #900c3f; /* Darker red for hover state */
+    background-color: #ffcc00; /* Darker red for hover state */
 }
 
 header .welcome {
@@ -107,7 +107,7 @@ form button {
 }
 
 form button:hover {
-    background-color: #900c3f; /* Darker red for hover state */
+    background-color: #ffcc00; /* Darker red for hover state */
 }
 
 textarea {
@@ -146,7 +146,7 @@ textarea {
 }
 
 .filter-form button:hover {
-    background-color: #900c3f;
+    background-color: #ffcc00;
 }
 
 /* Request Tray */

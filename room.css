@@ -50,7 +50,7 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #900c3f; /* Darker red for hover state */
+    background-color: #ed74a2; /*Darker red for hover state*/
 }
 
 header .welcome {

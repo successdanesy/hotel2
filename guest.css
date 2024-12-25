@@ -51,7 +51,7 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #900c3f;
+    background-color: #ffcc00;
 }
 
 header p {
@@ -90,7 +90,7 @@ header p {
 }
 
 .search-form button:hover {
-    background: #900c3f;
+    background-color: #ffcc00;
 }
 
 /* Table styling */
@@ -136,7 +136,7 @@ button {
 }
 
 button:hover {
-    background-color: #900c3f;
+    background-color: #ffcc00;
 }
 
 .pagination {
@@ -208,7 +208,7 @@ footer {
 }
 
 .button:hover {
-    background-color: #900c3f;
+    background-color: #ffcc00;
 }
 
 /* Media Queries for Mobile Devices */

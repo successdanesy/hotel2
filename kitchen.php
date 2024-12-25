@@ -235,7 +235,7 @@ $orders = fetchOrders($conn, $selected_date);
 <form method="GET" action="kitchen.php" class="filter-form">
     <label for="selected_date">Select Date:</label>
     <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-    <button type="submit" class="button">Filter</button>
+    <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter</button>
 </form>
 
 <!-- Orders Table -->

@@ -52,14 +52,15 @@ $requests = fetchRequests($conn, $selected_date);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitchen Imprest Requests</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="imprest_request.css">
 </head>
 <body>
 <div class="main-content">
     <header>
     <h1>Kitchen Imprest Requests</h1>
-        <a href="kitchen.php" class="button">Back to Kitchen</a>
-        <a href="logout.php" class="button">Logout</a>
+        <a href="kitchen.php" class="button"><i class="fa-solid fa-right-from-bracket"></i>Back to Kitchen</a>
+        <a href="logout.php" class="button"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
     </header>
 
     <form method="POST" action="imprest_request.php">
@@ -79,7 +80,7 @@ $requests = fetchRequests($conn, $selected_date);
     <form method="GET" action="imprest_request.php" class="filter-form">
         <label for="selected_date">Select Date:</label>
         <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-        <button type="submit" class="button">Filter</button>
+        <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter</button>
     </form>
 
     <table>

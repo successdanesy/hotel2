@@ -81,6 +81,7 @@ foreach ($combinedData as &$data) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Income Spreadsheet</title>
     <link rel="stylesheet" href="income.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
@@ -88,9 +89,9 @@ foreach ($combinedData as &$data) {
 <div class="main-content">
     <header>
         <h1>Income Spreadsheet</h1>
-        <a href="export_income.php?export=csv" class="button">Export to CSV</a>
+        <a href="export_income.php?export=csv" class="button"><i class="fa-solid fa-table"></i></i>Export to CSV</a>
         <a href="manager.php" class="button new-guest">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>Back
+        <i class="fa-solid fa-right-from-bracket"></i>Back
         </a>
     </header>
 
@@ -100,7 +101,7 @@ foreach ($combinedData as &$data) {
         <input type="date" id="start_date" name="start_date" value="<?php echo $startDate; ?>" required>
         <label for="end_date">End Date:</label>
         <input type="date" id="end_date" name="end_date" value="<?php echo $endDate; ?>" required>
-        <button type="submit" class="button">Filter</button>
+        <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter</button>
     </form>
 
     <table>

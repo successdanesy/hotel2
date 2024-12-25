@@ -45,7 +45,7 @@ header .button {
     display: flex;
     align-items: center;
     text-decoration: none;
-    background-color: #f4d03f; /* Gold for back button */
+    background-color: #efc312; /* Gold for back button */
   color: #900c3f; /* Dark red for button text */
     padding: 8px 16px;
     border-radius: 4px;
@@ -55,7 +55,7 @@ header .button {
 }
 
 header .button:hover {
-    background-color: #900c3f;
+    background-color: #ffcc00; /*Darker red for hover state*/
 }
 
 /* Form Container */
@@ -101,7 +101,7 @@ form button {
 
 /* Form button hover state */
 form button:hover {
-    background-color: #900c3f; /* Darker red for hover state */
+    background-color: #c19b27; /*Darker red for hover state*/
 }
 
 textarea {
@@ -140,7 +140,7 @@ textarea {
 }
 
 .filter-form button:hover {
-    background-color: #900c3f;
+    background-color: #ffcc00;
 }
 
 /* Table Styling */

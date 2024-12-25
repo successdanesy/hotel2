@@ -80,7 +80,7 @@ $stmt_bar->close();
         <form method="GET" action="home.php" class="filter-form">
             <label for="selected_date">Select Date:</label>
             <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-            <button type="submit" class="button">Filter</button>
+            <button type="submit" class="button"> <i class="fa-solid fa-filter"></i> Filter</button>
         </form>
 
         <!-- Dashboard Content -->
@@ -92,7 +92,7 @@ $stmt_bar->close();
                     <div class="room-status">
                         <div class="rooms-header">Check Rooms</div>
                         <button class="button view-tasks">
-                            <i class="fas fa-tasks"></i> <a href="room.php">View all rooms</a>
+                        <i class="fa-solid fa-person-booth"></i> <a href="room.php">View all rooms</a>
                         </button>
                         <button class="button view-tasks">
                             <i class="fas fa-tasks"></i> <a href="guest_management.php">Guest Management</a>
