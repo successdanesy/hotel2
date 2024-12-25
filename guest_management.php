@@ -104,13 +104,14 @@ while ($row = $result->fetch_assoc()) {
             <th>Guest Name</th>
             <th>Room Number</th>
             <th>Room Price</th>
+            <th>Discount</th> <!-- New column for discount -->
             <th>Check-in Date</th>
             <th>Check-out Date</th>
             <th>Payment Status</th>
             <th>Kitchen Order</th>
             <th>Bar Order</th>
             <th>Total Charges</th>
-            <th>Discount</th> <!-- New column for discount -->
+            
         </tr>
     </thead>
     <tbody>
@@ -120,13 +121,14 @@ while ($row = $result->fetch_assoc()) {
             <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
             <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
             <td>₦<?php echo number_format($guest['price'], 2); ?></td>
+            <td>₦<?php echo number_format($guest['discount'] ?? 0, 2); ?></td>
             <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
             <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
             <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
             <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
             <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
             <td>₦<?php echo number_format($guest['total_paid'], 2); ?></td>
-            <td>₦<?php echo number_format($guest['discount'] ?? 0, 2); ?></td>
+            
  <!-- Display the discount -->
             <td>
                 <a href="receipt.php?guest_id=<?php echo $guest['guest_id']; ?>" class="button">View</a>
