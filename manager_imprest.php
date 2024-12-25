@@ -260,9 +260,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_other_request'
                 ?>
             </tbody>
         </table>
-        <form method="POST" action="export_csv.php">
+        <!-- <form method="POST" action="export_csv.php">
             <button type="submit" name="export">Export Completed Requests as CSV</button>
-        </form>
+        </form> -->
     </section>
 
 </main>

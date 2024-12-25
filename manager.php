@@ -99,9 +99,13 @@ $stmt_bar->close();
         <section class="service-requests">
             <h2>Spreadsheet Export</h2>
             <div class="room-status">
-                <div class="rooms-header">Export Spreadsheets</div>
+                <div class="rooms-header">Income Spreadsheets</div>
                 <button class="button view-tasks">
                     <i class="fas fa-tasks"></i> <a href="income.php">Click Here</a>
+                </button>
+                <div class="rooms-header">Expense Spreadsheets</div>
+                <button class="button view-tasks">
+                    <i class="fas fa-tasks"></i> <a href="expense.php">Click Here</a>
                 </button>
             </div>
         </section>

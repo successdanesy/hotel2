@@ -88,7 +88,7 @@ foreach ($combinedData as &$data) {
 <div class="main-content">
     <header>
         <h1>Income Spreadsheet</h1>
-        <a href="income.php?export=csv" class="button">Export to CSV</a>
+        <a href="export_income.php?export=csv" class="button">Export to CSV</a>
         <a href="manager.php" class="button new-guest">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>Back
         </a>
