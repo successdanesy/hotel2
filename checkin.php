@@ -4,7 +4,7 @@ include('db_connect.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $guest_name = htmlspecialchars($_POST['guest_name']);
     $room_number = htmlspecialchars($_POST['room_number']);
-    $price = htmlspecialchars($_POST['price']);
+    $price = floatval($_POST['price']);
     $payment_status = htmlspecialchars($_POST['payment_status']);
     $payment_method = htmlspecialchars($_POST['payment_method']);
     $checkin_date = htmlspecialchars($_POST['checkin_date']);
@@ -17,10 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Calculate the discounted price
-    $discounted_price = $price - $discount;
-    if ($discounted_price < 0) {
-        $discounted_price = 0; // Prevent negative pricing
-    }
+    $discounted_price = max(0, $price - $discount);
+
+    // Calculate the total room charges
+    $checkin_date_obj = new DateTime($checkin_date);
+    $checkout_date_obj = new DateTime($checkout_date);
+    $total_days = $checkin_date_obj->diff($checkout_date_obj)->days;
+    $total_room_charges = $discounted_price * $total_days;
 
     // Start a transaction
     $conn->begin_transaction();
@@ -35,11 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Get the guest_id of the newly inserted guest
         $guest_id = $stmt1->insert_id;
 
-        // Insert booking details into the bookings table
-        $insert_booking_query = "INSERT INTO bookings (guest_name, room_number, price, payment_status, payment_method, checkin_date, checkout_date, guest_id, discount) 
-                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // Insert booking details into the bookings table, including total_room_charges
+        $insert_booking_query = "INSERT INTO bookings (guest_name, room_number, price, payment_status, payment_method, checkin_date, checkout_date, guest_id, discount, total_room_charges) 
+                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt2 = $conn->prepare($insert_booking_query);
-        $stmt2->bind_param("ssdssssis", $guest_name, $room_number, $discounted_price, $payment_status, $payment_method, $checkin_date, $checkout_date, $guest_id, $discount);
+        $stmt2->bind_param("ssdssssisd", $guest_name, $room_number, $discounted_price, $payment_status, $payment_method, $checkin_date, $checkout_date, $guest_id, $discount, $total_room_charges);
         $stmt2->execute();
 
         // Store the guest_id in the session for future use (e.g., kitchen orders, bar orders)
@@ -66,4 +69,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: room.php?error=Invalid request.');
     exit();
 }
-?>

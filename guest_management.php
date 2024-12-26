@@ -111,6 +111,7 @@ while ($row = $result->fetch_assoc()) {
             <th>Kitchen Order</th>
             <th>Bar Order</th>
             <th>Total Charges</th>
+            <th>Print Receipts</th>
             
         </tr>
     </thead>
@@ -127,7 +128,8 @@ while ($row = $result->fetch_assoc()) {
             <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
             <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
             <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>
-            <td>₦<?php echo number_format($guest['total_paid'], 2); ?></td>
+            <td>₦<?php echo number_format($guest['total_paid'] ?? 0, 2); ?></td>
+
             
  <!-- Display the discount -->
             <td>
