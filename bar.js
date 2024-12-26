@@ -11,13 +11,9 @@ function fetchGuestId() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Set the guest_id in a form input field
                 document.getElementById('guest_id').value = data.guest_id;
-
-                // Update the status message on the page
                 document.getElementById('status').innerText = 'Guest ID found: ' + data.guest_id;
             } else {
-                // If there's an error, clear the guest_id field and show the error message
                 document.getElementById('guest_id').value = '';
                 document.getElementById('status').innerText = 'Error: ' + data.error;
             }
@@ -74,7 +70,6 @@ document.getElementById('addToTray').addEventListener('click', () => {
     addItemToTray(menuItemId, menuItemText, price, specialInstructions);
 });
 
-// Add item to tray and update the table
 function addItemToTray(menuItemId, menuItemText, price, specialInstructions) {
     orderTray.push({ menuItemId, menuItemText, price, specialInstructions });
     const row = document.createElement('tr');
@@ -86,7 +81,6 @@ function addItemToTray(menuItemId, menuItemText, price, specialInstructions) {
     `;
     orderTrayTable.appendChild(row);
 
-    // Remove item from tray
     row.querySelector('.remove-item').addEventListener('click', () => {
         orderTray.splice(Array.from(orderTrayTable.children).indexOf(row), 1);
         row.remove();
@@ -126,24 +120,21 @@ function sendOrderToServer(orderData) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
     })
-    .then(response => response.json().catch(() => {
-        throw new Error('Failed to parse JSON response');
-    }))
-    .then(data => {
-        if (data.success) {
-            alert('Order submitted successfully!');
-            orderTray.length = 0;
-            orderTrayTable.innerHTML = ''; // Clear the table
-        } else {
-            alert('Error: ' + data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Order submitted successfully!');
+                orderTray.length = 0;
+                orderTrayTable.innerHTML = '';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
 }
-
 
 // Mark Order as Completed
 function markAsComplete(orderId) {
@@ -175,7 +166,7 @@ function markAsComplete(orderId) {
 function fetchOrders() {
     $.ajax({
         url: 'fetch_orders_bar.php',
-        success: function(response) {
+        success: function (response) {
             $('#orders-table tbody').html(response);
         }
     });
@@ -212,19 +203,6 @@ function clearAllOrders() {
     updateOrderSummary();
 }
 
-function loadDynamicContent() {
-    // Your dynamic content loading logic here
-    // After content is loaded, attach the event listener:
-
-    const clearButton = document.getElementById('clearAllOrdersButton');
-    if (clearButton) {
-        clearButton.addEventListener('click', clearAllOrders);
-    }
-}
-
-// Call this function after the content is dynamically added
-loadDynamicContent();
-
 // Confirm Order and Send to Front Desk
 function confirmOrder() {
     const roomNumber = document.getElementById('roomNumber').value;
@@ -237,45 +215,48 @@ function confirmOrder() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(responseData => {
-        if (responseData.success) {
-            alert('Order sent successfully!');
-            clearAllOrders();
-        } else {
-            alert('Failed to send order. Please try again.');
-        }
-    })
-    .catch(error => console.error('Error:', error));
+        .then(response => response.json())
+        .then(responseData => {
+            if (responseData.success) {
+                alert('Order sent successfully!');
+                clearAllOrders();
+            } else {
+                alert('Failed to send order. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
 }
 
+// Dynamically Load Content
 function loadDynamicContent() {
-    // Your dynamic content loading logic here
-    // After the form is added dynamically, attach the event listener:
+    const clearButton = document.getElementById('clearAllOrdersButton');
+    if (clearButton) {
+        clearButton.addEventListener('click', clearAllOrders);
+    }
 
     const addOrderForm = document.getElementById('add-order-form');
     if (addOrderForm) {
         addOrderForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            let formData = new FormData(this);
+            const formData = new FormData(this);
 
-            fetch('add_order.php', {
+            fetch('add_order_bar.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Order added successfully!');
-                    location.reload();
-                } else {
-                    alert('Failed to add order. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error occurred. Please try again.');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order added successfully!');
+                        location.reload();
+                    } else {
+                        alert('Failed to add order. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error occurred. Please try again.');
+                });
         });
     }
 }

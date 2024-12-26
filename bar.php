@@ -47,11 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_order'])) {
 
         if ($roomNumber && $itemName && $itemPrice && $guestId) {
             $orderQuery = "INSERT INTO bar_orders 
-                           (room_number, order_description, status, timestamp, total_amount, special_instructions, guest_id, guest_type) 
-                           VALUES (?, ?, 'Pending', NOW(), ?, ?, ?, ?)";
+                           (room_number, order_description, status, timestamp, total_amount, special_instructions, guest_id) 
+                           VALUES (?, ?, 'Pending', NOW(), ?, ?, ?)";
             $stmt = $conn->prepare($orderQuery);
-            $stmt->bind_param("ssdsd", $roomNumber, $itemName, $itemPrice, $specialInstructions, $guestId, $guestType);
-
+            $stmt->bind_param("ssdsd", $roomNumber, $itemName, $itemPrice, $specialInstructions, $guestId);
+            
             if ($stmt->execute()) {
                 header("Location: bar.php");
                 exit();
@@ -74,11 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_order'])) {
 
         if ($itemName && $itemPrice) {
             $orderQuery = "INSERT INTO bar_orders 
-                           (order_description, status, timestamp, total_amount, special_instructions, guest_type) 
-                           VALUES (?, 'Pending', NOW(), ?, ?, ?)";
+                           (order_description, status, timestamp, total_amount, special_instructions, guest_id) 
+                           VALUES (?, 'Pending', NOW(), ?, ?, NULL)";
             $stmt = $conn->prepare($orderQuery);
-            $stmt->bind_param("sds", $itemName, $itemPrice, $specialInstructions, $guestType);
-
+            $stmt->bind_param("sds", $itemName, $itemPrice, $specialInstructions);
+            
             if ($stmt->execute()) {
                 header("Location: bar.php");
                 exit();
@@ -137,137 +137,143 @@ $orders = fetchOrders($conn, $selected_date);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antilla Bar Page</title>
+    <title>Antilla Bar Staff</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="bar.css">
+    <link rel="stylesheet" href="kitchen.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<div class="main-content">
+    <div class="main-content">
         <header>
-        <h1>Bar Orders</h1>
+            <h1>Bar Orders</h1>
             <p>Manage Bar Orders Below.</p>
 
             <a href="imprest_request_bar.php" class="button new-guest">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Bar imprest
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Imprest Request
             </a>
+
             <a href="logout.php" class="button new-guest">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </header>
 
-<form id="orderForm" method="POST" action="bar.php">
-    <!-- Guest Type Selection -->
-    <div>
-        <label for="guest_type">Guest Type:</label>
-        <select id="guest_type" name="guest_type" onchange="toggleGuestFields()">
-            <option value="guest">Guest</option>
-            <option value="non_guest">Non-Guest</option>
-        </select>
-    </div>
+        <!-- Order Form -->
+        <form id="orderForm" method="POST" action="bar.php">
+            <!-- Guest Type Selection -->
+            <div>
+                <label for="guest_type">Guest Type:</label>
+                <select id="guest_type" name="guest_type" onchange="toggleGuestFields()">
+                    <option value="guest">Guest</option>
+                    <option value="non_guest">Non-Guest</option>
+                </select>
+            </div>
 
-    <!-- Room Selection -->
-    <div id="guest_fields">
-        <label for="room_number">Room Number:</label>
-        <select name="room_number" id="room_number">
-            <option value="">-- Select Room --</option>
-            <?php
-            $roomsQuery = "SELECT id, room_number FROM rooms WHERE status = 'Occupied'";
-            $roomsResult = $conn->query($roomsQuery);
-            while ($room = $roomsResult->fetch_assoc()) {
-                echo "<option value='{$room['room_number']}'>{$room['room_number']}</option>";
-            }
-            ?>
-        </select>
-        <div id="guest-id-lookup">
+            <!-- Room Selection -->
+            <div id="guest_fields">
+                <label for="room_number">Room Number:</label>
+                <select name="room_number" id="room_number">
+                    <option value="">-- Select Room --</option>
+                    <?php
+                    $roomsQuery = "SELECT id, room_number FROM rooms WHERE status = 'Occupied'";
+                    $roomsResult = $conn->query($roomsQuery);
+                    while ($room = $roomsResult->fetch_assoc()) {
+                        echo "<option value='{$room['room_number']}'>{$room['room_number']}</option>";
+                    }
+                    ?>
+                </select>
+                <div id="guest-id-lookup">
             <label for="guest_id">Guest ID:</label>
             <input type="text" id="guest_id" readonly>
             <button type="button" onclick="fetchGuestId()">Fetch Guest ID</button>
             <p id="status"></p>
         </div>
-    </div>
+            </div>
 
-    <!-- Menu Selection -->
-    <div>
-        <label for="category">Category:</label>
-        <select id="category" required>
-            <option value="">-- Select Category --</option>
-            <?php foreach ($categories as $category): ?>
-                <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['category_name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div>
-        <label for="menu_item">Menu Item:</label>
-        <select id="menu_item" required>
-            <option value="">-- Select Menu Item --</option>
-        </select>
-    </div>
+            <!-- Menu Selection -->
+            <div>
+                <label for="category">Category:</label>
+                <select id="category" required>
+                    <option value="">-- Select Category --</option>
+                    <?php foreach ($categories as $category): ?>
+                        <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['category_name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label for="menu_item">Menu Item:</label>
+                <select id="menu_item" required>
+                    <option value="">-- Select Menu Item --</option>
+                </select>
+            </div>
 
-    <div>
-        <label for="special_instructions">Special Instructions:</label>
-        <textarea id="special_instructions" name="special_instructions" placeholder="Add any instructions..."></textarea>
-    </div>
-    <button type="button" id="addToTray">Add to Tray</button>
-</form>
+            <div>
+                <label for="special_instructions">Special Instructions:</label>
+                <textarea id="special_instructions" name="special_instructions" placeholder="Add any instructions..."></textarea>
+            </div>
+            <button type="button" id="addToTray">Add to Tray</button>
+        </form>
 
-<h3>Order Tray</h3>
-<table id="orderTray">
-    <thead>
-        <tr>
-            <th>Item</th>
-            <th>Price (₦)</th>
-            <th>Instructions</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Tray items will be dynamically added here -->
-    </tbody>
-</table>
-<button id="submitOrders" type="button">Submit Orders</button>
-<!-- Date Filter Form -->
-<form method="GET" action="bar.php" class="filter-form">
-    <label for="selected_date">Select Date:</label>
-    <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-    <button type="submit" class="button">Filter</button>
-</form>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Room</th>
-                <th>Order</th>
-                <th>Price (₦)</th>
-                <th>Instructions</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($orders as $order): ?>
+        <!-- Order Tray -->
+        <h3>Order Tray</h3>
+        <table id="orderTray">
+            <thead>
                 <tr>
-                    <td><?= $order['id'] ?></td>
-                    <td><?= htmlspecialchars($order['room_number']) ?></td>
-                    <td><?= htmlspecialchars($order['order_description']) ?></td>
-                    <td><?= number_format($order['total_amount'], 2) ?></td>
-                    <td><?= htmlspecialchars($order['special_instructions']) ?></td>
-                    <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
-                    <td>
-                        <?php if ($order['status'] !== 'Completed'): ?>
-                            <button onclick="markAsComplete(<?= $order['id'] ?>)" id="mark-completed-btn-<?= $order['id'] ?>">Mark Completed</button>
-                        <?php else: ?>
-                            <button disabled>Completed</button>
-                        <?php endif; ?>
-                    </td>
+                    <th>Item</th>
+                    <th>Price (₦)</th>
+                    <th>Instructions</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-    
+            </thead>
+            <tbody>
+                <!-- Tray items will be dynamically added here -->
+            </tbody>
+        </table>
+        <button id="submitOrders" type="button">Submit Orders</button>
+
+        <!-- Date Filter Form -->
+        <form method="GET" action="bar.php" class="filter-form">
+            <label for="selected_date">Select Date:</label>
+            <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
+            <button type="submit" class="button"><i class="fa-solid fa-filter"></i> Filter</button>
+        </form>
+
+        <!-- Orders Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Room</th>
+                    <th>Order</th>
+                    <th>Price (₦)</th>
+                    <th>Instructions</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($orders as $order): ?>
+                    <tr>
+                        <td><?= $order['id'] ?></td>
+                        <td><?= htmlspecialchars($order['room_number']) ?></td>
+                        <td><?= htmlspecialchars($order['order_description']) ?></td>
+                        <td><?= number_format($order['total_amount'], 2) ?></td>
+                        <td><?= htmlspecialchars($order['special_instructions']) ?></td>
+                        <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
+                        <td>
+                            <?php if ($order['status'] !== 'Completed'): ?>
+                                <button onclick="markAsComplete(<?= $order['id'] ?>)" id="mark-completed-btn-<?= $order['id'] ?>">Mark Completed</button>
+                            <?php else: ?>
+                                <button disabled>Completed</button>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
     <script>
         const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
 
@@ -313,9 +319,7 @@ $orders = fetchOrders($conn, $selected_date);
         // Initial call to set guest fields visibility
         toggleGuestFields();
     </script>
-    
+
     <script src="bar.js"></script>
-</div>
 </body>
 </html>
-
