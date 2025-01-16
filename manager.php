@@ -16,7 +16,7 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-require_once 'server.php'; // To include your database connection
+// require_once 'server.php'; // To include your database connection
 
 // Get the selected date from the form submission or default to today's date
 $selected_date = isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d');

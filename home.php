@@ -16,7 +16,7 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-require_once 'server.php'; // To include your database connection
+// require_once 'server.php'; // To include your database connection
 
 // Get the selected date from the form submission or default to today's date
 $selected_date = isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d');
@@ -92,10 +92,10 @@ $stmt_bar->close();
                     <div class="room-status">
                         <div class="rooms-header">Check Rooms</div>
                         <button class="button view-tasks">
-                        <i class="fa-solid fa-person-booth"></i> <a href="room.php">View all rooms</a>
+                        <i class="fa-solid fa-person-booth"></i> <a href="room.php">View all / Book rooms</a>
                         </button>
                         <button class="button view-tasks">
-                            <i class="fas fa-tasks"></i> <a href="guest_management.php">Guest Management</a>
+                            <i class="fas fa-tasks"></i> <a href="guest_management.php">Guest Management/ Print Reciepts</a>
                         </button>
                     </div>
                 </section>

@@ -71,8 +71,22 @@ foreach ($barData as $bar) {
 
 // Calculate TOTAL SUM for each date
 foreach ($combinedData as &$data) {
+    // Initialize missing keys to 0
+    if (!isset($data['front_desk'])) {
+        $data['front_desk'] = 0;
+    }
+    if (!isset($data['restaurant'])) {
+        $data['restaurant'] = 0;
+    }
+    if (!isset($data['bar'])) {
+        $data['bar'] = 0;
+    }
+
+    // Calculate the total sum
     $data['total_sum'] = $data['front_desk'] + $data['restaurant'] + $data['bar'];
 }
+unset($data); // Break the reference with the last element
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
