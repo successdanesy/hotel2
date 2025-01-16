@@ -275,6 +275,26 @@ $orders = fetchOrders($conn, $selected_date);
 </div>
 
 <script>
+
+document.getElementById('submitOrders').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const form = document.getElementById('orderForm');
+    const formData = new FormData(form);
+
+    fetch('kitchen.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Reload the page after a successful order submission
+        window.location.reload();
+    })
+    .catch(error => console.error('Error submitting order:', error));
+});
+
+
     const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
 
     function toggleGuestFields() {
