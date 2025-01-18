@@ -4,7 +4,7 @@ include('db_connect.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $guest_name = htmlspecialchars($_POST['guest_name']);
     $room_number = htmlspecialchars($_POST['room_number']);
-    $price = floatval($_POST['price']);
+    $price = floatval(str_replace('₦', '', $_POST['price'])); // Remove currency symbol and convert to float
     $payment_status = htmlspecialchars($_POST['payment_status']);
     $payment_method = htmlspecialchars($_POST['payment_method']);
     $checkin_date = htmlspecialchars($_POST['checkin_date']);
@@ -69,3 +69,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: room.php?error=Invalid request.');
     exit();
 }
+?>

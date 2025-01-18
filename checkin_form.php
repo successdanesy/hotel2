@@ -54,13 +54,22 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
         <section class="checkin-form">
             <form method="POST" action="checkin.php">
                 <label for="guest_name">Guest Name:</label>
-                <input type="text" id="guest_name" name="guest_name" required>
+                <input type="text" id="guest_name" name="guest_name" placeholder="Enter Guest Name" required>
 
                 <label for="room_number">Room Number:</label>
                 <input type="text" id="room_number" name="room_number" value="<?php echo $room_number; ?>" readonly>
 
+                <label for="checkin_date">Check-in Date:</label>
+                <input type="date" id="checkin_date" name="checkin_date" required onchange="updatePrice()">
+
+                <label for="checkout_date">Check-out Date:</label>
+                <input type="date" id="checkout_date" name="checkout_date" required>
+
                 <label for="price">Price (per night):</label>
-                <input type="text" id="price" name="price" value="<?php echo $price; ?>" readonly>
+                <input type="text" id="price" name="price" placeholder="Set Check-in Date First" readonly>
+
+                <input type="hidden" id="weekday_price" value="<?php echo $weekday_price; ?>">
+                <input type="hidden" id="weekend_price" value="<?php echo $weekend_price; ?>">
 
                 <label for="discount">Discount Amount (₦):</label>
                 <input type="text" id="discount" name="discount" placeholder="Enter discount" oninput="validateDiscountInput(event)">
@@ -75,13 +84,8 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
                 <select id="payment_method" name="payment_method" required>
                     <option value="Cash">Cash</option>
                     <option value="POS">POS</option>
+                    <!-- <option value="Transfer">Transfer</option> -->
                 </select>
-
-                <label for="checkin_date">Check-in Date:</label>
-                <input type="date" id="checkin_date" name="checkin_date" required>
-
-                <label for="checkout_date">Check-out Date:</label>
-                <input type="date" id="checkout_date" name="checkout_date" required>
 
                 <button type="submit" class="button checkin-btn">Complete Check-in</button>
             </form>
@@ -106,6 +110,25 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
             alert('Please enter a valid number for discount.');
         }
     }
+
+    // Function to update price based on check-in date 
+    function updatePrice() {
+    const checkinDate = document.getElementById('checkin_date').value;
+    const weekdayPrice = parseFloat(document.getElementById('weekday_price').value);
+    const weekendPrice = parseFloat(document.getElementById('weekend_price').value);
+    const priceField = document.getElementById('price');
+
+    if (checkinDate) {
+        const date = new Date(checkinDate);
+        const dayOfWeek = date.getUTCDay(); // Get the day of the week (0 = Sunday, 6 = Saturday)
+
+        // Check if the day is Friday (5) or Saturday (6) or Sunday (0)
+        const price = (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6) ? weekendPrice : weekdayPrice;
+        priceField.value = '₦' + price.toFixed(2); // Update the price field
+    }
+}
+ 
+            // Initial call to update the price field based on current date updatePrice();
 </script>
 
 </body>
