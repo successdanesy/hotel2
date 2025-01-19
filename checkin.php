@@ -10,6 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $checkin_date = htmlspecialchars($_POST['checkin_date']);
     $checkout_date = htmlspecialchars($_POST['checkout_date']);
 
+// Validate check-in and check-out dates
+if ($checkout_date_obj <= $checkin_date_obj) {
+    header('Location: room.php?error=Check-out date must be after check-in date.');
+    exit();
+}
+
     // Handle the discount
     $discount = 0; // Default discount is 0
     if (isset($_POST['discount']) && trim($_POST['discount']) !== "" && ctype_digit($_POST['discount'])) {
