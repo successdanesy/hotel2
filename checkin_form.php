@@ -49,20 +49,23 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
         <header>
             <h1>Check-in Form</h1>
             <p>Fill in the guest details to complete the check-in process.</p>
+            <a href="room.php" class="button new-guest">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>Go Back
+            </a>
         </header>
 
         <section class="checkin-form">
             <form method="POST" action="checkin.php">
-                <label for="guest_name">Guest Name:</label>
+                <label for="guest_name">1. Guest Name:</label>
                 <input type="text" id="guest_name" name="guest_name" placeholder="Enter Guest Name" required>
 
-                <label for="room_number">Room Number:</label>
+                <label for="room_number">Room Number</label>
                 <input type="text" id="room_number" name="room_number" value="<?php echo $room_number; ?>" readonly>
 
-                <label for="checkin_date">Check-in Date:</label>
+                <label for="checkin_date">2. Check-in Date:</label>
                 <input type="date" id="checkin_date" name="checkin_date" required onchange="updatePrice()">
 
-                <label for="checkout_date">Check-out Date:</label>
+                <label for="checkout_date">3. Check-out Date:</label>
                 <input type="date" id="checkout_date" name="checkout_date" required>
 
                 <label for="price">Price (per night):</label>
@@ -74,13 +77,13 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
                 <label for="discount">Discount Amount (₦):</label>
                 <input type="text" id="discount" name="discount" placeholder="Enter discount" oninput="validateDiscountInput(event)">
 
-                <label for="payment_status">Payment Status:</label>
+                <label for="payment_status">4. Payment Status:</label>
                 <select id="payment_status" name="payment_status" required>
                     <option value="Pay Now">Pay Now</option>
                     <option value="Pay at Checkout">Pay at Checkout</option>
                 </select>
 
-                <label for="payment_method">Payment Method:</label>
+                <label for="payment_method">5. Payment Method:</label>
                 <select id="payment_method" name="payment_method" required>
                     <option value="Cash">Cash</option>
                     <option value="POS">POS</option>
@@ -91,11 +94,11 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
             </form>
         </section>
 
-        <section class="back-to-room-management">
+        <!-- <section class="back-to-room-management">
             <form action="room.php" method="GET">
                 <button type="submit" class="button back-button">Back to Room Management</button>
             </form>
-        </section>
+        </section> -->
     </div>
 
     <script>

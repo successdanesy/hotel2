@@ -73,14 +73,14 @@ $requests = fetchRequests($conn, $selected_date);
         <!-- <label for="price">Price (₦):</label>
         <input type="number" name="price" id="price" step="0.01"> -->
 
-        <button type="submit" name="submit_request">Submit Request</button>
+        <button type="submit" name="submit_request">Submit Request To Manager</button>
     </form>
 
     <!-- Date Filter Form -->
     <form method="GET" action="imprest_request.php" class="filter-form">
         <label for="selected_date">Select Date:</label>
         <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-        <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter</button>
+        <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter by Date</button>
     </form>
 
     <table>

@@ -80,7 +80,7 @@ $stmt_bar->close();
         <form method="GET" action="home.php" class="filter-form">
             <label for="selected_date">Select Date:</label>
             <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-            <button type="submit" class="button"> <i class="fa-solid fa-filter"></i> Filter</button>
+            <button type="submit" class="button"> <i class="fa-solid fa-filter"></i> Filter Past Kitchen/Bar Details by Date</button>
         </form>
 
         <!-- Dashboard Content -->

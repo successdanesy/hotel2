@@ -51,7 +51,8 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #ffcc00;
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 header p {
@@ -90,7 +91,8 @@ header p {
 }
 
 .search-form button:hover {
-    background-color: #ffcc00;
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 /* Table styling */
@@ -136,7 +138,8 @@ button {
 }
 
 button:hover {
-    background-color: #ffcc00;
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 .pagination {
@@ -208,7 +211,8 @@ footer {
 }
 
 .button:hover {
-    background-color: #ffcc00;
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 /* Media Queries for Mobile Devices */

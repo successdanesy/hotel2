@@ -50,7 +50,8 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #ed74a2; /*Darker red for hover state*/
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+    color: #fff;
 }
 
 header .welcome {
@@ -140,6 +141,8 @@ form .book-btn {
 
 form .book-btn:hover {
     background-color: #218838;
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+    color: white;
 }
 
 /* Check-out Button */
@@ -149,6 +152,8 @@ form .checkout-btn {
 
 form .checkout-btn:hover {
     background-color: #a93226;
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+    color: white;
 }
 
 /* Complete Check-in Button */
@@ -167,6 +172,9 @@ form .checkout-btn:hover {
     background-color: #218838;
     transform: translateY(-3px);
 }
+
+/*complete check-out button*/
+
 
 /* Form styles */
 form {
@@ -265,6 +273,8 @@ form button {
 
 .back-to-room-management .button:hover {
     background-color: #e0a800; /* Darker gold */
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+    color: white;
 }
 
 /* Footer */

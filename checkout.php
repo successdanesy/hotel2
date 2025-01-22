@@ -109,6 +109,9 @@ $total_charges = $total_room_charges + $additional_charges;
         <header>
             <h1>Guest Checkout</h1>
             <p>Review the details and complete the checkout process.</p>
+            <a href="room.php" class="button new-guest">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>Back to Room Management
+            </a>
         </header>
 
         <section class="checkin-form">
@@ -165,11 +168,11 @@ $total_charges = $total_room_charges + $additional_charges;
 </form>
         </section>
 
-        <section class="back-to-room-management">
+        <!-- <section class="back-to-room-management">
             <form action="room.php" method="GET">
                 <button type="submit" class="button back-button">Back to Room Management</button>
             </form>
-        </section>
+        </section> -->
     </div> </body>
 </html>
 

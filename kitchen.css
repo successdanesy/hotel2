@@ -48,7 +48,8 @@ header .button i {
 }
 
 header .button:hover {
-    background-color: #ffcc00; /* Darker red for hover state */
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 header .welcome {
@@ -107,7 +108,8 @@ form button {
 }
 
 form button:hover {
-    background-color: #900c3f; /* Darker red for hover state */
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 textarea {
@@ -137,8 +139,8 @@ textarea {
 
 .filter-form button {
     padding: 8px 12px;
-    background-color: #f4d03f; /* Gold for back button */
-  color: #900c3f; /* Dark red for button text */
+    background-color: #4caf50; /* Gold for back button */
+  color: white; /* Dark red for button text */
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -146,7 +148,8 @@ textarea {
 }
 
 .filter-form button:hover {
-    background-color: #ffcc00;
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 /* Order Tray */
@@ -194,13 +197,14 @@ textarea {
 }
 
 #orderTray td button:hover {
-    background-color: #c0392b; /* Darker red for hover state */
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 /* Submit Orders Button */
 #submitOrders {
-    background-color: #28a745; /* Green background for submit button */
-    color: white;
+    background-color: #f4d03f; /* Green background for submit button */
+    color: black;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -212,8 +216,8 @@ textarea {
 }
 
 #submitOrders:hover {
-    background-color: #218838; /* Darker green for hover state */
-    transform: scale(1.05);
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 #submitOrders:active {
@@ -277,7 +281,8 @@ table tbody td button {
 }
 
 table tbody td button:hover {
-    background-color: #45a049; /* Darker green for hover state */
+    transform: scale(1.05); /* Adds a subtle zoom effect */
+  color: white;
 }
 
 table tbody td button:disabled {

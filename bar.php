@@ -230,8 +230,9 @@ $orders = fetchOrders($conn, $selected_date);
                 <!-- Tray items will be dynamically added here -->
             </tbody>
         </table>
-        <button id="submitOrders" type="button">Submit Orders</button>
-
+        <button id="submitOrders" type="button">Submit Orders To Front-Desk</button>
+<br>
+<br>
         <!-- Date Filter Form -->
         <form method="GET" action="bar.php" class="filter-form">
             <label for="selected_date">Select Date:</label>

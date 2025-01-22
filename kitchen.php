@@ -229,16 +229,18 @@ $orders = fetchOrders($conn, $selected_date);
         <!-- Tray items will be dynamically added here -->
     </tbody>
 </table>
-<button id="submitOrders" type="button">Submit Orders</button>
 
+<button id="submitOrders" type="button">Submit Orders To Front-Desk</button>
+<br>
+<br>
+<!-- Orders Table -->
+<h3>Submitted Orders</h3>
 <!-- Date Filter Form -->
 <form method="GET" action="kitchen.php" class="filter-form">
     <label for="selected_date">Select Date:</label>
     <input type="date" id="selected_date" name="selected_date" value="<?php echo $selected_date; ?>" required>
-    <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter</button>
+    <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter By Date</button>
 </form>
-
-<!-- Orders Table -->
 <table>
     <thead>
         <tr>
