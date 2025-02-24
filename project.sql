@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 26, 2024 at 04:40 PM
+-- Generation Time: Feb 24, 2025 at 03:42 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `project`
 --
+CREATE DATABASE IF NOT EXISTS `project` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `project`;
 
 -- --------------------------------------------------------
 
@@ -27,6 +29,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `bar_orders`
 --
 
+DROP TABLE IF EXISTS `bar_orders`;
 CREATE TABLE `bar_orders` (
   `id` int(11) NOT NULL,
   `room_number` varchar(255) DEFAULT NULL,
@@ -39,12 +42,21 @@ CREATE TABLE `bar_orders` (
   `guest_type` varchar(20) DEFAULT 'guest'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `bar_orders`
+--
+
+INSERT INTO `bar_orders` (`id`, `room_number`, `order_description`, `status`, `timestamp`, `total_amount`, `special_instructions`, `guest_id`, `guest_type`) VALUES
+(39, NULL, 'Hennessy VSOP (₦180000.00)', 'pending', '2025-01-16 09:36:04', 180000.00, 'testing page refresh', NULL, 'non_guest'),
+(40, NULL, 'Gordon (₦15000.00)', 'pending', '2025-01-16 09:42:58', 15000.00, 'testing page refresh 2', NULL, 'non_guest');
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `bookings`
 --
 
+DROP TABLE IF EXISTS `bookings`;
 CREATE TABLE `bookings` (
   `booking_id` int(11) NOT NULL,
   `room_number` varchar(10) NOT NULL,
@@ -60,12 +72,24 @@ CREATE TABLE `bookings` (
   `total_room_charges` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `bookings`
+--
+
+INSERT INTO `bookings` (`booking_id`, `room_number`, `price`, `payment_status`, `payment_method`, `checkin_date`, `checkout_date`, `guest_id`, `guest_name`, `discount`, `total_paid`, `total_room_charges`) VALUES
+(229, '101', 40000.00, 'Pay Now', 'Cash', '2025-01-19', '2025-01-20', 191, 'Success', 7500.00, 40000.00, 0.00),
+(230, '103', 40000.00, 'Pay Now', 'Cash', '2025-01-20', '2025-01-21', 192, 'ifeanyi', 15000.00, 40000.00, 0.00),
+(231, '206', 30000.00, 'Pay Now', 'Cash', '2025-01-19', '2025-01-20', 193, 'olajide', 7500.00, 30000.00, 0.00),
+(232, '303', 30000.00, 'Pay Now', 'Cash', '2025-01-20', '2025-01-21', 194, 'Success', 15000.00, 30000.00, 30000.00),
+(233, '206', 30000.00, 'Pay Now', 'Cash', '2025-01-19', '2025-01-20', 195, 'name', 7500.00, 30000.00, 30000.00);
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `categories`
 --
 
+DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `id` int(11) NOT NULL,
   `category_name` varchar(255) NOT NULL
@@ -98,6 +122,7 @@ INSERT INTO `categories` (`id`, `category_name`) VALUES
 -- Table structure for table `categories_bar`
 --
 
+DROP TABLE IF EXISTS `categories_bar`;
 CREATE TABLE `categories_bar` (
   `id` int(11) NOT NULL,
   `category_name` varchar(255) NOT NULL
@@ -127,10 +152,46 @@ INSERT INTO `categories_bar` (`id`, `category_name`) VALUES
 -- Table structure for table `guests`
 --
 
+DROP TABLE IF EXISTS `guests`;
 CREATE TABLE `guests` (
   `guest_id` int(11) NOT NULL,
   `guest_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `guests`
+--
+
+INSERT INTO `guests` (`guest_id`, `guest_name`) VALUES
+(162, 'total_room_charges calculation 1 '),
+(163, 'total_room_charges calculation 2 '),
+(164, 'total_room_charges calculation 3'),
+(165, 'total_room_charges calculation 4 '),
+(166, 'total_room_charges calculation 5'),
+(167, 'total room charge bug 1'),
+(168, 'total room charge bug 2'),
+(169, 'saturday test 1'),
+(170, 'saturday test 2'),
+(171, 'saturday test 3'),
+(172, 'saturday test 4'),
+(173, 'saturday test 5'),
+(174, 'saturday test 6'),
+(175, 'saturday test 7'),
+(176, 'saturday test 8'),
+(180, 'saturday test 1'),
+(183, 'saturday test 1'),
+(184, 'saturday test 22222'),
+(185, 'Success Chukwuemeka'),
+(186, 'Amaka chukwuemeka'),
+(187, 'Kelechi chukwuemeka'),
+(188, 'Success'),
+(189, 'ifeanyi'),
+(190, 'olajide'),
+(191, 'Success'),
+(192, 'ifeanyi'),
+(193, 'olajide'),
+(194, 'Success'),
+(195, 'name');
 
 -- --------------------------------------------------------
 
@@ -138,6 +199,7 @@ CREATE TABLE `guests` (
 -- Table structure for table `imprest_requests`
 --
 
+DROP TABLE IF EXISTS `imprest_requests`;
 CREATE TABLE `imprest_requests` (
   `id` int(11) NOT NULL,
   `item_name` varchar(255) NOT NULL,
@@ -147,12 +209,20 @@ CREATE TABLE `imprest_requests` (
   `timestamp` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `imprest_requests`
+--
+
+INSERT INTO `imprest_requests` (`id`, `item_name`, `quantity`, `status`, `price`, `timestamp`) VALUES
+(30, 'Bread', '1 loaf', 'Completed', 6000.00, '2024-12-31 16:55:19');
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `imprest_requests_bar`
 --
 
+DROP TABLE IF EXISTS `imprest_requests_bar`;
 CREATE TABLE `imprest_requests_bar` (
   `id` int(11) NOT NULL,
   `item_name` varchar(255) NOT NULL,
@@ -162,12 +232,20 @@ CREATE TABLE `imprest_requests_bar` (
   `timestamp` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `imprest_requests_bar`
+--
+
+INSERT INTO `imprest_requests_bar` (`id`, `item_name`, `quantity`, `status`, `price`, `timestamp`) VALUES
+(16, 'double black', '1 pack', 'Completed', '16000', '2024-12-31 15:05:41');
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `kitchen_orders`
 --
 
+DROP TABLE IF EXISTS `kitchen_orders`;
 CREATE TABLE `kitchen_orders` (
   `id` int(11) NOT NULL,
   `room_number` varchar(255) DEFAULT NULL,
@@ -180,12 +258,21 @@ CREATE TABLE `kitchen_orders` (
   `guest_type` varchar(20) DEFAULT 'guest'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `kitchen_orders`
+--
+
+INSERT INTO `kitchen_orders` (`id`, `room_number`, `order_description`, `status`, `timestamp`, `total_amount`, `special_instructions`, `guest_id`, `guest_type`) VALUES
+(41, NULL, 'Full Goat Head Pepper Soup (₦8000.00)', 'pending', '2025-01-16 09:35:45', 8000.00, 'testing page refresh', NULL, 'non_guest'),
+(42, NULL, 'Basmatics White Rice (₦2000.00)', 'pending', '2025-01-16 09:43:56', 2000.00, 'testing refresh button 2', NULL, 'non_guest');
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `menu_items`
 --
 
+DROP TABLE IF EXISTS `menu_items`;
 CREATE TABLE `menu_items` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -347,6 +434,7 @@ INSERT INTO `menu_items` (`id`, `name`, `price`, `category_id`) VALUES
 -- Table structure for table `menu_items_bar`
 --
 
+DROP TABLE IF EXISTS `menu_items_bar`;
 CREATE TABLE `menu_items_bar` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -445,6 +533,7 @@ INSERT INTO `menu_items_bar` (`id`, `name`, `price`, `category_id`) VALUES
 -- Table structure for table `other_imprests`
 --
 
+DROP TABLE IF EXISTS `other_imprests`;
 CREATE TABLE `other_imprests` (
   `id` int(11) NOT NULL,
   `item_name` varchar(255) NOT NULL,
@@ -460,6 +549,7 @@ CREATE TABLE `other_imprests` (
 -- Table structure for table `rooms`
 --
 
+DROP TABLE IF EXISTS `rooms`;
 CREATE TABLE `rooms` (
   `id` int(11) NOT NULL,
   `room_number` varchar(255) DEFAULT NULL,
@@ -498,6 +588,7 @@ INSERT INTO `rooms` (`id`, `room_number`, `room_type`, `status`, `weekday_price`
 -- Table structure for table `users`
 --
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
@@ -613,13 +704,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bar_orders`
 --
 ALTER TABLE `bar_orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=202;
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -637,25 +728,25 @@ ALTER TABLE `categories_bar`
 -- AUTO_INCREMENT for table `guests`
 --
 ALTER TABLE `guests`
-  MODIFY `guest_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=159;
+  MODIFY `guest_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=196;
 
 --
 -- AUTO_INCREMENT for table `imprest_requests`
 --
 ALTER TABLE `imprest_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `imprest_requests_bar`
 --
 ALTER TABLE `imprest_requests_bar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `kitchen_orders`
 --
 ALTER TABLE `kitchen_orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `menu_items`
