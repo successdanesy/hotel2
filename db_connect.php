@@ -18,7 +18,7 @@ echo "Connection was successfully established!";
 
 
 
-// Database connection details
+<!-- //Database connection details
 //$host = 'localhost';  // Host name (usually 'localhost')
 //$username = 'root';   // Your database username (typically 'root' for local dev)
 //$password = '';       // Your database password (empty for XAMPP by default)
@@ -31,5 +31,5 @@ echo "Connection was successfully established!";
 //if ($conn->connect_error) {
     //die("Connection failed: " . $conn->connect_error);
 //}
-// echo "Connected successfully"; // You can keep this for debugging purposes
+// echo "Connected successfully"; // You can keep this for debugging purposes -->
 
