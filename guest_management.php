@@ -103,15 +103,15 @@ while ($row = $result->fetch_assoc()) {
             <th>Guest ID</th>
             <th>Guest Name</th>
             <th>Room Number</th>
-            <th>Room Price</th>
-            <th>Discount</th> <!-- New column for discount -->
             <th>Check-in Date</th>
             <th>Check-out Date</th>
+            <th>Discount</th> <!-- New column for discount -->
+            <th>Room Price (After Discount)</th>
             <th>Payment Status</th>
             <th>Kitchen Order</th>
             <th>Bar Order</th>
             <th>Total Charges</th>
-            <th>Print Receipts</th>
+            <th>View Details</th>
             
         </tr>
     </thead>
@@ -121,10 +121,10 @@ while ($row = $result->fetch_assoc()) {
             <td><?php echo htmlspecialchars($guest['guest_id'] ?? 'ID Not Available'); ?></td>
             <td><?php echo htmlspecialchars($guest['guest_name'] ?? 'Guest Name Not Available'); ?></td>
             <td><?php echo htmlspecialchars($guest['room_number']); ?></td>
-            <td>₦<?php echo number_format($guest['price'], 2); ?></td>
-            <td>₦<?php echo number_format($guest['discount'] ?? 0, 2); ?></td>
             <td><?php echo htmlspecialchars($guest['checkin_date']); ?></td>
             <td><?php echo htmlspecialchars($guest['checkout_date']); ?></td>
+            <td>₦<?php echo number_format($guest['discount'] ?? 0, 2); ?></td>
+            <td>₦<?php echo number_format($guest['price'], 2); ?></td>
             <td><?php echo htmlspecialchars($guest['payment_status']); ?></td>
             <td>₦<?php echo number_format($guest['kitchen_order_total'], 2); ?></td>
             <td>₦<?php echo number_format($guest['bar_order_total'], 2); ?></td>

@@ -147,52 +147,54 @@ $orders = fetchOrders($conn, $selected_date);
 <body>
     <div class="main-content">
         <header>
-            <h1>Bar Orders</h1>
+            <h1><i class="fa-solid fa-wine-bottle"></i>Bar Orders</h1>
             <p>Manage Bar Orders Below.</p>
-
             <a href="imprest_request_bar.php" class="button new-guest">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Imprest Request
+                <i class="fas fa-hand-holding-usd icon"></i> Imprest Request
             </a>
-
             <a href="logout.php" class="button new-guest">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </header>
 
-        <!-- Order Form -->
-        <form id="orderForm" method="POST" action="bar.php">
-            <!-- Guest Type Selection -->
-            <div>
-                <label for="guest_type">Guest Type:</label>
-                <select id="guest_type" name="guest_type" onchange="toggleGuestFields()">
-                    <option value="guest">Guest</option>
-                    <option value="non_guest">Non-Guest</option>
-                </select>
-            </div>
-
-            <!-- Room Selection -->
-            <div id="guest_fields">
-                <label for="room_number">Room Number:</label>
-                <select name="room_number" id="room_number">
-                    <option value="">-- Select Room --</option>
-                    <?php
-                    $roomsQuery = "SELECT id, room_number FROM rooms WHERE status = 'Occupied'";
-                    $roomsResult = $conn->query($roomsQuery);
-                    while ($room = $roomsResult->fetch_assoc()) {
-                        echo "<option value='{$room['room_number']}'>{$room['room_number']}</option>";
-                    }
-                    ?>
-                </select>
-                <div id="guest-id-lookup">
-            <label for="guest_id">Guest ID:</label>
-            <input type="text" id="guest_id" readonly>
-            <button type="button" onclick="fetchGuestId()">Fetch Guest ID</button>
-            <p id="status"></p>
+        <form id="orderForm" method="POST" action="kitchen.php">
+    <!-- Guest Information Section -->
+        <div class="section">
+            <h2><i class="fas fa-user icon"></i>Guest Information</h2>
+                <div class="form-group">
+                    <label for="guest_type">Guest Type:</label>
+                    <select id="guest_type" name="guest_type" onchange="toggleGuestFields()">
+                        <option value="guest">Guest</option>
+                        <option value="non_guest">Non-Guest</option>
+                    </select>
+                </div>
+                <div id="guest_fields" class="form-group">
+                    <label for="room_number">Room Number:</label>
+                    <select name="room_number" id="room_number">
+                        <option value="">-- Select Room --</option>
+                        <?php
+                        $roomsQuery = "SELECT id, room_number FROM rooms WHERE status = 'Occupied'";
+                        $roomsResult = $conn->query($roomsQuery);
+                        while ($room = $roomsResult->fetch_assoc()) {
+                            echo "<option value='{$room['room_number']}'>{$room['room_number']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div id="guest-id-lookup" class="form-group">
+                    <label for="guest_id">Guest ID:</label>
+                    <input type="text" id="guest_id" readonly>
+                    <p id="status"></p>
+                    <br>
+                    <button type="button" class="button" onclick="fetchGuestId()">Fetch Guest ID</button>
+                </div>
+            
         </div>
-            </div>
 
-            <!-- Menu Selection -->
-            <div>
+            <!-- drink Selection Section -->
+        <div class="section">
+            <h2><i class="fa-solid fa-martini-glass-citrus"></i>Drink Selection</h2>
+            <div class="form-group">
                 <label for="category">Category:</label>
                 <select id="category" required>
                     <option value="">-- Select Category --</option>
@@ -201,38 +203,44 @@ $orders = fetchOrders($conn, $selected_date);
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
+            <div class="form-group">
                 <label for="menu_item">Menu Item:</label>
                 <select id="menu_item" required>
                     <option value="">-- Select Menu Item --</option>
                 </select>
             </div>
-
-            <div>
+            <div class="form-group">
                 <label for="special_instructions">Special Instructions:</label>
                 <textarea id="special_instructions" name="special_instructions" placeholder="Add any instructions..."></textarea>
             </div>
-            <button type="button" id="addToTray">Add to Tray</button>
-        </form>
+            <button type="button" id="addToTray" class="button"><i class="fas fa-plus icon"></i>Add to Tray</button>
+        </div>
+    </form>
 
-        <!-- Order Tray -->
-        <h3>Order Tray</h3>
-        <table id="orderTray">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Price (₦)</th>
-                    <th>Instructions</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Tray items will be dynamically added here -->
-            </tbody>
-        </table>
-        <button id="submitOrders" type="button">Submit Orders To Front-Desk</button>
+        <!-- Order Tray Section -->
+<div class="section">
+            <h2><i class="fas fa-shopping-cart icon"></i>Order Tray</h2>
+            <table id="orderTray">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Price (₦)</th>
+                        <th>Instructions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Tray items will be dynamically added here -->
+                </tbody>
+            </table>
+            <button id="submitOrders" type="button" class="button"><i class="fas fa-paper-plane icon"></i>Submit Orders To Front-Desk</button>
+        </div>
 <br>
 <br>
+
+<!-- Submitted Orders Section -->
+<div class="section">
+            <h2><i class="fas fa-list icon"></i>Submitted Orders</h2>
         <!-- Date Filter Form -->
         <form method="GET" action="bar.php" class="filter-form">
             <label for="selected_date">Select Date:</label>

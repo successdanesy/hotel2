@@ -43,62 +43,83 @@ $price = (date('N') >= 5) ? $weekend_price : $weekday_price;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check-in Form</title>
     <link rel="stylesheet" href="room.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="main-content">
-        <header>
-            <h1>Check-in Form</h1>
+    <header>
+            <h1><i class="fas fa-user-check icon"></i>Check-in Form</h1>
             <p>Fill in the guest details to complete the check-in process.</p>
             <a href="room.php" class="button new-guest">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>Go Back
+                <i class="fas fa-arrow-left icon"></i>Go Back
             </a>
         </header>
 
         <section class="checkin-form">
             <form method="POST" action="checkin.php">
-                <label for="guest_name">1. Guest Name:</label>
-                <input type="text" id="guest_name" name="guest_name" placeholder="Enter Guest Name" required>
+                <!-- Guest Details Section -->
+                <div class="section">
+                    <h2><i class="fas fa-user icon"></i>Guest Information</h2>
+                    <div class="form-group">
+                        <label for="guest_name">Guest Name:</label>
+                        <input type="text" id="guest_name" name="guest_name" placeholder="Enter Guest Name" required>
+                    </div>
+                </div>
 
-                <label for="room_number">Room Number</label>
-                <input type="text" id="room_number" name="room_number" value="<?php echo $room_number; ?>" readonly>
-
-                <label for="checkin_date">2. Check-in Date:</label>
-                <input type="date" id="checkin_date" name="checkin_date" required onchange="updatePrice()">
-
-                <label for="checkout_date">3. Check-out Date:</label>
-                <input type="date" id="checkout_date" name="checkout_date" required>
-
-                <label for="price">Price (per night):</label>
-                <input type="text" id="price" name="price" placeholder="Set Check-in Date First" readonly>
+                 <!-- Room Details Section -->
+                 <div class="section">
+                    <h2><i class="fas fa-bed icon"></i>Room Information</h2>
+                    <div class="form-group">
+                        <label for="room_number">Room Number:</label>
+                        <input type="text" id="room_number" name="room_number" value="<?php echo $room_number; ?>" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkin_date">Check-in Date:</label>
+                        <input type="date" id="checkin_date" name="checkin_date" required onchange="updatePrice()">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkout_date">Check-out Date:</label>
+                        <input type="date" id="checkout_date" name="checkout_date" required onchange="updatePrice()">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price (per night):</label>
+                        <input type="text" id="price" name="price" placeholder="Set Check-in Date First" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="discount">Discount Amount (₦):</label>
+                        <input type="text" id="discount" name="discount" placeholder="Enter discount" oninput="validateDiscountInput(event)">
+                    </div>
+                </div>
 
                 <input type="hidden" id="weekday_price" value="<?php echo $weekday_price; ?>">
                 <input type="hidden" id="weekend_price" value="<?php echo $weekend_price; ?>">
 
-                <label for="discount">Discount Amount (₦):</label>
-                <input type="text" id="discount" name="discount" placeholder="Enter discount" oninput="validateDiscountInput(event)">
 
-                <label for="payment_status">4. Payment Status:</label>
-                <select id="payment_status" name="payment_status" required>
-                    <option value="Pay Now">Pay Now</option>
-                    <option value="Pay at Checkout">Pay at Checkout</option>
-                </select>
+                <!-- Payment Details Section -->
+                <div class="section">
+                    <h2><i class="fas fa-money-bill-wave icon"></i>Payment Information</h2>
+                    <div class="form-group">
+                        <label for="payment_status">Payment Status:</label>
+                        <select id="payment_status" name="payment_status" required>
+                            <option value="Pay Now">Pay Now</option>
+                            <option value="Pay at Checkout">Pay at Checkout</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method:</label>
+                        <select id="payment_method" name="payment_method" required>
+                            <option value="Cash">Cash</option>
+                            <option value="POS">POS</option>
+                        </select>
+                    </div>
+                </div>
 
-                <label for="payment_method">5. Payment Method:</label>
-                <select id="payment_method" name="payment_method" required>
-                    <option value="Cash">Cash</option>
-                    <option value="POS">POS</option>
-                    <!-- <option value="Transfer">Transfer</option> -->
-                </select>
-
-                <button type="submit" class="button checkin-btn">Complete Check-in</button>
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <button type="submit" class="button checkin-btn"><i class="fas fa-check icon"></i>Complete Check-in</button>
+                </div>
             </form>
         </section>
-
-        <!-- <section class="back-to-room-management">
-            <form action="room.php" method="GET">
-                <button type="submit" class="button back-button">Back to Room Management</button>
-            </form>
-        </section> -->
     </div>
 
     <script>

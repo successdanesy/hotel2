@@ -96,6 +96,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login_user'])) {
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password" placeholder="**************" required>
                 </div>
+                <h3>Note: Please Make Sure Your System Date Is Correct</h3>
+                <br>
                 <button type="submit" class="login-btn" name="login_user">Log In</button>
             </form>
         </div>
