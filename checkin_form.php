@@ -5,7 +5,7 @@ include('db_connect.php');
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     $_SESSION['msg'] = "You must log in first";
-    header('location: login.php');
+    header('location: index.php');
     exit();
 }
 
