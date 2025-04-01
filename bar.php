@@ -15,7 +15,6 @@ foreach ($menuItems as $item) {
     $menuItemsByCategory[$item['category_id']][] = [
         'id' => $item['id'],
         'name' => $item['name'],
-        'price' => $item['price']
     ];
 }
 
@@ -121,7 +120,7 @@ if (DateTime::createFromFormat('Y-m-d', $selected_date) === false) {
 
 // Fetch orders based on the selected date
 function fetchOrders($conn, $selected_date) {
-    $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp 
+    $query = "SELECT id, room_number, order_description, quantity, total_amount, special_instructions, status, timestamp 
               FROM bar_orders 
               WHERE DATE(timestamp) = ? 
               ORDER BY timestamp DESC";
@@ -204,11 +203,33 @@ $orders = fetchOrders($conn, $selected_date);
                 </select>
             </div>
             <div class="form-group">
-                <label for="menu_item">Menu Item:</label>
-                <select id="menu_item" required>
-                    <option value="">-- Select Menu Item --</option>
-                </select>
+            <label for="menu_item">Menu Item:</label>
+            <select id="menu_item" name="menu_item">
+    <option value="">-- Select Menu Item --</option>
+    <?php foreach ($menuItems as $item): ?>
+        <option value="<?= $item['id'] ?>">
+    <?= htmlspecialchars($item['name']) ?>
+</option>
+
+
+    <?php endforeach; ?>
+</select>
+
             </div>
+
+            <div class="price-adjustment">
+    <button type="button" class="adjust-price" data-amount="-500">-500</button>
+    <button type="button" class="adjust-price" data-amount="-200">-200</button>
+    <button type="button" class="adjust-price" data-amount="-100">-100</button>
+    <button type="button" class="adjust-price" data-amount="-50">-50</button>
+
+    <span id="current_price" data-menu-id="" data-original-price="0">₦0</span>
+
+    <button type="button" class="adjust-price" data-amount="50">+50</button>
+    <button type="button" class="adjust-price" data-amount="100">+100</button>
+    <button type="button" class="adjust-price" data-amount="200">+200</button>
+    <button type="button" class="adjust-price" data-amount="500">+500</button>
+</div>
             <div class="form-group">
                 <label for="special_instructions">Special Instructions:</label>
                 <textarea id="special_instructions" name="special_instructions" placeholder="Add any instructions..."></textarea>
@@ -224,6 +245,7 @@ $orders = fetchOrders($conn, $selected_date);
                 <thead>
                     <tr>
                         <th>Item</th>
+                        <th>Quantity</th>  <!-- ✅ Added Quantity Column -->
                         <th>Price (₦)</th>
                         <th>Instructions</th>
                         <th>Actions</th>
@@ -255,6 +277,7 @@ $orders = fetchOrders($conn, $selected_date);
                     <th>ID</th>
                     <th>Room</th>
                     <th>Order</th>
+                    <th>Quantity</th>  <!-- ✅ Added Quantity Column -->
                     <th>Price (₦)</th>
                     <th>Instructions</th>
                     <th>Status</th>
@@ -267,6 +290,8 @@ $orders = fetchOrders($conn, $selected_date);
                         <td><?= $order['id'] ?></td>
                         <td><?= htmlspecialchars($order['room_number']) ?></td>
                         <td><?= htmlspecialchars($order['order_description']) ?></td>
+                        <td><?= isset($order['quantity']) ? $order['quantity'] : 'N/A' ?></td>
+  <!-- ✅ Show Quantity -->
                         <td><?= number_format($order['total_amount'], 2) ?></td>
                         <td><?= htmlspecialchars($order['special_instructions']) ?></td>
                         <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
@@ -291,7 +316,7 @@ document.getElementById('submitOrders').addEventListener('click', function(event
     const form = document.getElementById('orderForm');
     const formData = new FormData(form);
 
-    fetch('kitchen.php', {
+    fetch('bar.php', {
         method: 'POST',
         body: formData
     })
@@ -307,10 +332,23 @@ document.getElementById('submitOrders').addEventListener('click', function(event
         const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
 
         function toggleGuestFields() {
-            var guestType = document.getElementById("guest_type").value;
-            var guestFields = document.getElementById("guest_fields");
-            guestFields.style.display = (guestType === "guest") ? "block" : "none";
-        }
+    var guestType = document.getElementById("guest_type").value;
+    var guestFields = document.getElementById("guest_fields"); // Room Number dropdown
+    var guestIdLookup = document.getElementById("guest-id-lookup"); // Guest ID & Fetch button
+
+    if (guestType === "guest") {
+        guestFields.style.display = "block";  // Show Room Number dropdown
+        guestIdLookup.style.display = "block"; // Show Guest ID & Fetch button
+    } else {
+        guestFields.style.display = "none";   // Hide Room Number dropdown
+        guestIdLookup.style.display = "none"; // Hide Guest ID & Fetch button
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    toggleGuestFields(); // ✅ Ensures fields are set correctly on page load
+    document.getElementById("guest_type").addEventListener("change", toggleGuestFields);
+});
 
         document.getElementById('category').addEventListener('change', function() {
             var categoryId = this.value;

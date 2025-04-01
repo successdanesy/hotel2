@@ -4,7 +4,7 @@ include('db_connect.php'); // Database connection
 
 // Fetch categories and menu items
 $queryCategories = "SELECT id, category_name FROM categories ORDER BY category_name";
-$queryMenuItems = "SELECT id, name, price, category_id FROM menu_items";
+$queryMenuItems = "SELECT id, name, category_id FROM menu_items"; // ❌ Removed 'price'
 
 $categories = $conn->query($queryCategories)->fetch_all(MYSQLI_ASSOC);
 $menuItems = $conn->query($queryMenuItems)->fetch_all(MYSQLI_ASSOC);
@@ -15,7 +15,7 @@ foreach ($menuItems as $item) {
     $menuItemsByCategory[$item['category_id']][] = [
         'id' => $item['id'],
         'name' => $item['name'],
-        'price' => $item['price']
+        
     ];
 }
 
@@ -121,10 +121,11 @@ if (DateTime::createFromFormat('Y-m-d', $selected_date) === false) {
 
 // Fetch orders based on the selected date
 function fetchOrders($conn, $selected_date) {
-    $query = "SELECT id, room_number, order_description, total_amount, special_instructions, status, timestamp 
-              FROM kitchen_orders 
-              WHERE DATE(timestamp) = ? 
-              ORDER BY timestamp DESC";
+    $query = "SELECT id, room_number, order_description, quantity, total_amount, special_instructions, status, timestamp 
+          FROM kitchen_orders 
+          WHERE DATE(timestamp) = ? 
+          ORDER BY timestamp DESC";
+
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $selected_date);
     $stmt->execute();
@@ -204,11 +205,35 @@ $orders = fetchOrders($conn, $selected_date);
                 </select>
             </div>
             <div class="form-group">
-                <label for="menu_item">Menu Item:</label>
-                <select id="menu_item" required>
-                    <option value="">-- Select Menu Item --</option>
-                </select>
+            <label for="menu_item">Menu Item:</label>
+            <select id="menu_item" name="menu_item">
+    <option value="">-- Select Menu Item --</option>
+    <?php foreach ($menuItems as $item): ?>
+        <option value="<?= $item['id'] ?>">
+    <?= htmlspecialchars($item['name']) ?>
+</option>
+
+
+    <?php endforeach; ?>
+</select>
+
             </div>
+
+            <div class="price-adjustment">
+    <button type="button" class="adjust-price" data-amount="-500">-500</button>
+    <button type="button" class="adjust-price" data-amount="-200">-200</button>
+    <button type="button" class="adjust-price" data-amount="-100">-100</button>
+    <button type="button" class="adjust-price" data-amount="-50">-50</button>
+
+    <span id="current_price" data-menu-id="" data-original-price="0">₦0</span>
+
+    <button type="button" class="adjust-price" data-amount="50">+50</button>
+    <button type="button" class="adjust-price" data-amount="100">+100</button>
+    <button type="button" class="adjust-price" data-amount="200">+200</button>
+    <button type="button" class="adjust-price" data-amount="500">+500</button>
+</div>
+
+
             <div class="form-group">
                 <label for="special_instructions">Special Instructions:</label>
                 <textarea id="special_instructions" name="special_instructions" placeholder="Add any instructions..."></textarea>
@@ -221,18 +246,20 @@ $orders = fetchOrders($conn, $selected_date);
 <div class="section">
             <h2><i class="fas fa-shopping-cart icon"></i>Order Tray</h2>
             <table id="orderTray">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Price (₦)</th>
-                        <th>Instructions</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Tray items will be dynamically added here -->
-                </tbody>
-            </table>
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>  <!-- ✅ Added Quantity Column -->
+            <th>Price (₦)</th>
+            <th>Instructions</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Tray items will be dynamically added here -->
+    </tbody>
+</table>
+
             <button id="submitOrders" type="button" class="button"><i class="fas fa-paper-plane icon"></i>Submit Orders To Front-Desk</button>
         </div>
 <br>
@@ -247,36 +274,41 @@ $orders = fetchOrders($conn, $selected_date);
     <button type="submit" class="button"><i class="fa-solid fa-filter"></i>Filter By Date</button>
 </form>
 <table>
-    <thead>
+<thead>
+    <tr>
+        <th>ID</th>
+        <th>Room</th>
+        <th>Order</th>
+        <th>Quantity</th>  <!-- ✅ Added Quantity Column -->
+        <th>Price (₦)</th>
+        <th>Instructions</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+
+<tbody>
+    <?php foreach ($orders as $order): ?>
         <tr>
-            <th>ID</th>
-            <th>Room</th>
-            <th>Order</th>
-            <th>Price (₦)</th>
-            <th>Instructions</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <td><?= $order['id'] ?></td>
+            <td><?= htmlspecialchars($order['room_number']) ?></td>
+            <td><?= htmlspecialchars($order['order_description']) ?></td>
+            <td><?= isset($order['quantity']) ? $order['quantity'] : 'N/A' ?></td>
+  <!-- ✅ Show Quantity -->
+            <td><?= number_format($order['total_amount'], 2) ?></td>
+            <td><?= htmlspecialchars($order['special_instructions']) ?></td>
+            <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
+            <td>
+                <?php if ($order['status'] !== 'Completed'): ?>
+                    <button onclick="markAsComplete(<?= $order['id'] ?>)" id="mark-completed-btn-<?= $order['id'] ?>">Mark Completed</button>
+                <?php else: ?>
+                    <button disabled>Completed</button>
+                <?php endif; ?>
+            </td>
         </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($orders as $order): ?>
-            <tr>
-                <td><?= $order['id'] ?></td>
-                <td><?= htmlspecialchars($order['room_number']) ?></td>
-                <td><?= htmlspecialchars($order['order_description']) ?></td>
-                <td><?= number_format($order['total_amount'], 2) ?></td>
-                <td><?= htmlspecialchars($order['special_instructions']) ?></td>
-                <td id="status-<?= $order['id'] ?>"><?= htmlspecialchars($order['status']) ?></td>
-                <td>
-                    <?php if ($order['status'] !== 'Completed'): ?>
-                        <button onclick="markAsComplete(<?= $order['id'] ?>)" id="mark-completed-btn-<?= $order['id'] ?>">Mark Completed</button>
-                    <?php else: ?>
-                        <button disabled>Completed</button>
-                    <?php endif; ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
+    <?php endforeach; ?>
+</tbody>
+
 </table>
 
 </div>
@@ -305,10 +337,25 @@ document.getElementById('submitOrders').addEventListener('click', function(event
     const menuItemsByCategory = <?= json_encode($menuItemsByCategory) ?>;
 
     function toggleGuestFields() {
-        var guestType = document.getElementById("guest_type").value;
-        var guestFields = document.getElementById("guest_fields");
-        guestFields.style.display = (guestType === "guest") ? "block" : "none";
+    var guestType = document.getElementById("guest_type").value;
+    var guestFields = document.getElementById("guest_fields"); // Room Number dropdown
+    var guestIdLookup = document.getElementById("guest-id-lookup"); // Guest ID & Fetch button
+
+    if (guestType === "guest") {
+        guestFields.style.display = "block";  // Show Room Number dropdown
+        guestIdLookup.style.display = "block"; // Show Guest ID & Fetch button
+    } else {
+        guestFields.style.display = "none";   // Hide Room Number dropdown
+        guestIdLookup.style.display = "none"; // Hide Guest ID & Fetch button
     }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    toggleGuestFields(); // ✅ Ensures fields are set correctly on page load
+    document.getElementById("guest_type").addEventListener("change", toggleGuestFields);
+});
+
+
 
     document.getElementById('category').addEventListener('change', function() {
         var categoryId = this.value;

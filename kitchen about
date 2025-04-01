@@ -1,0 +1,92 @@
+kitchen sub files are:
+
+KITCHEN.PHP - 
+Overview of kitchen.php
+1. Fetches categories and menu items from the database.
+2. Displays a form to take orders (guest or non-guest).
+3. Handles order submission to the database.
+4. Fetches and displays orders for a selected date.
+5. Allows marking an order as completed via AJAX.
+6. Includes frontend scripts for dynamic category-menu selection and order submission.
+
+imprest_request.php - 
+1. Allows kitchen staff to request imprest (funds or supplies).
+2. Stores requests in imprest_requests table with a Pending status.
+3. Provides a date filter to view requests for a specific day.
+4. Displays a table of imprest requests (ID, item, quantity, price, status, timestamp).
+
+kitchen.css - 
+1. Responsive Design: Adjusts layout for tablets & smaller screens.
+2. Styled Headers & Buttons: Dark red header (#900c3f), gold buttons (#f4d03f), and green actions (#4caf50).
+3. Tables: Alternating row colors and hover effects for better readability.
+4. Order Tray & Imprest Request Forms: Styled with shadows, borders, and proper spacing.
+5. Smooth Button Effects: Scale on hover and transition effects.
+
+kitchen.js - 
+1. Fetches guest ID based on room number
+2. Handles category-based menu filtering
+3. Manages the order tray (adding/removing items)
+4. Submits orders to the server (submit_orders.php)
+5. Marks orders as completed (kitchen.php AJAX update)
+6. Fetches orders dynamically (fetch_orders.php)
+7. Manages order summary and sending to the front desk (send_to_frontdesk.php)
+
+submit_orders.php - 
+1. Receives JSON data (guest type, room number, guest ID, order tray, special instructions).
+2. Processes orders: For guests: Stores room_number, guest_id, and guest_type.
+For non-guests: Omits room_number and guest_id.
+3. Inserts each order into kitchen_orders table.
+4. Returns a JSON response with success or error messages.
+
+submit_imprest_requests.php - 
+This PHP file handles imprest requests submission by receiving JSON data and inserting it into the imprest_requests table.
+
+1. Receives JSON data from the request (itemName, quantity, price).
+2. Validates the data:
+Ensures JSON is properly formatted.
+Checks that itemName and quantity are provided.
+Confirms price is numeric.
+3. Prepares and executes an SQL statement for each item.
+4. Returns a JSON response with success or failure.
+
+
+fetch_orders.php - 
+This PHP file fetches all kitchen orders from the kitchen_orders table and returns them as table rows for dynamic display on the kitchen page.
+
+1. Queries kitchen_orders, fetching all orders sorted by timestamp DESC.
+2. Loops through orders, outputting a table row (<tr>) for each.
+3. Displays key order details:
+id, room_number, order_description, total_amount, special_instructions, and status.
+4. Handles order completion:
+If status is "pending", it shows a "Mark as Complete" button.
+If completed, it displays "Sent to Front Desk".
+
+send_to_frontdesk.php - 
+This PHP file handles sending orders to the kitchen from the front desk. It receives JSON data and inserts it into the kitchen_orders table.
+
+1. Receives JSON payload containing:
+roomNumber, orders, totalAmount, specialInstructions.
+2. Prepares an SQL statement to insert the order.
+3. Encodes the orders array as JSON before storing it in the database.
+4. Executes the insert query and sends a JSON response based on success or failure.
+
+add_order.php - 
+This PHP file adds a new kitchen order for a guest based on their room number.
+
+1. Receives form data (room_number, menu_item, special_instructions).
+2. Fetches the menu item details (name, price) from menu_items table.
+3. Retrieves the guest ID for the selected room_number from rooms table.
+4. Inserts the order into kitchen_orders with Pending status.
+5. Returns a JSON response confirming success or failure.
+
+get_guest_id_by_room.php - 
+This PHP file retrieves the guest ID for a given room number and returns it as a JSON response.
+
+1. Checks if room_number is provided via GET.
+2. Queries the rooms table for the guest_id where status = 'Occupied'.
+3. Returns a JSON response:
+If a guest is found, returns { "success": true, "guest_id": 123 }.
+If no guest is found, returns { "success": false, "error": "No guest found for this room" }.
+If room_number is missing, returns { "success": false, "error": "Room number is required" }.
+
+update_menu_price.php

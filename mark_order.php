@@ -4,7 +4,7 @@ include('db_connect.php'); // Include database connection
 
 // Check if the user is logged in and has the correct role
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'kitchen') {
-    header('Location: index.php');
+    header('Location: login.php');
     exit();
 }
 

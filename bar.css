@@ -13,56 +13,6 @@ body {
     padding: 20px;
 }
 
-/* .main-content {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-} */
-
-.section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: #f9f9f9;
-    border-radius: 4px;
-}
-.form-group {
-    margin-bottom: 15px;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-}
-.form-group input, .form-group select, .form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-table th, table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-table th {
-    background-color: #007bff;
-    color: #fff;
-}
-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
 /* Header styling */
 header {
     display: flex;
@@ -98,8 +48,7 @@ header .button i {
 }
 
 header .button:hover {
-    transform: scale(1.05); /* Adds a subtle zoom effect */
-  color: white;
+    background-color: #900c3f; /* Darker red for hover state */
 }
 
 header .welcome {
@@ -136,7 +85,7 @@ form label {
     color: #555;
 }
 
-form select, form input[type="date"], form textarea, form button {
+form select, form textarea, form button {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -144,7 +93,7 @@ form select, form input[type="date"], form textarea, form button {
     font-size: 14px;
 }
 
-form select:focus, form input[type="date"]:focus, form textarea:focus {
+form select:focus, form textarea:focus {
     outline: none;
     border-color: #c70039; /* Red focus color */
 }
@@ -158,8 +107,7 @@ form button {
 }
 
 form button:hover {
-    transform: scale(1.05); /* Adds a subtle zoom effect */
-  color: white;
+    background-color: #900c3f; /* Darker red for hover state */
 }
 
 textarea {
@@ -189,8 +137,8 @@ textarea {
 
 .filter-form button {
     padding: 8px 12px;
-    background-color: #4caf50; /* Gold for back button */
-  color: white; /* Dark red for button text */
+    background-color: #f4d03f; /* Gold for back button */
+  color: #900c3f; /* Dark red for button text */
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -198,8 +146,7 @@ textarea {
 }
 
 .filter-form button:hover {
-    transform: scale(1.05); /* Adds a subtle zoom effect */
-  color: white;
+    background-color: #900c3f;
 }
 
 /* Order Tray */
@@ -247,14 +194,13 @@ textarea {
 }
 
 #orderTray td button:hover {
-    transform: scale(1.05); /* Adds a subtle zoom effect */
-  color: white;
+    background-color: #c0392b; /* Darker red for hover state */
 }
 
 /* Submit Orders Button */
 #submitOrders {
-    background-color: #f4d03f; /* Green background for submit button */
-    color: black;
+    background-color: #28a745; /* Green background for submit button */
+    color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -266,8 +212,8 @@ textarea {
 }
 
 #submitOrders:hover {
-    transform: scale(1.05); /* Adds a subtle zoom effect */
-  color: white;
+    background-color: #218838; /* Darker green for hover state */
+    transform: scale(1.05);
 }
 
 #submitOrders:active {
@@ -331,8 +277,7 @@ table tbody td button {
 }
 
 table tbody td button:hover {
-    transform: scale(1.05); /* Adds a subtle zoom effect */
-  color: white;
+    background-color: #45a049; /* Darker green for hover state */
 }
 
 table tbody td button:disabled {
@@ -395,50 +340,3 @@ table tbody td#status-Pending {
         font-size: 0.9rem;
     }
 }
-
-
-
-/* Styling the price adjustment buttons */
-.price-adjustment {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.price-adjustment button {
-    background-color: #ffcc00; /* Bright yellow */
-    color: #000; /* Black text */
-    font-size: 16px;
-    font-weight: bold;
-    border: 2px solid #000; /* Black border */
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.2s ease-in-out;
-}
-
-.price-adjustment button:hover {
-    background-color: #ffb300; /* Darker yellow */
-    transform: scale(1.1); /* Slight zoom effect */
-}
-
-.price-adjustment button:active {
-    background-color: #e6a800; /* Even darker yellow on click */
-    transform: scale(1.05);
-}
-
-/* Styling the current price display */
-#current_price {
-    font-size: 20px;
-    font-weight: bold;
-    background: #fff;
-    border: 2px solid #ffcc00;
-    padding: 8px 15px;
-    border-radius: 5px;
-    display: inline-block;
-    min-width: 100px;
-    text-align: center;
-}
-
-

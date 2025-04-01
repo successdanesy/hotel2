@@ -16,12 +16,33 @@ $status = 'Pending';
 $timestamp = date('Y-m-d H:i:s');
 
 // Insert order into the kitchen_orders table
-$query = "INSERT INTO kitchen_orders (room_number, order_description, status, total_amount, special_instructions, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
+$query = "INSERT INTO kitchen_orders (room_number, order_description, quantity, status, total_amount, special_instructions, timestamp) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($query);
 
 // Bind parameters: room_number (string), orders (JSON), status (string), total_amount (float), special_instructions (string), timestamp (datetime)
-$stmt->bind_param("ssssss", $roomNumber, json_encode($orders), $status, $totalAmount, $specialInstructions, $timestamp);
+foreach ($orders as $order) {
+    $orderDescription = $order['menuItemText'];
+    $quantity = $order['quantity']; // ✅ Get quantity from order
+    $price = $order['price']; // ✅ Ensure we store the price correctly
 
+    // ✅ Prepare statement for each order
+    $stmt = $conn->prepare("INSERT INTO kitchen_orders (room_number, order_description, quantity, status, total_amount, special_instructions, timestamp) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+    if (!$stmt) {
+        die(json_encode(['success' => false, 'error' => 'Query Preparation Failed: ' . $conn->error]));
+    }
+
+    // ✅ Bind parameters properly
+    $stmt->bind_param("ssisdss", $roomNumber, $orderDescription, $quantity, $status, $price, $specialInstructions, $timestamp);
+
+    if (!$stmt->execute()) {
+        die(json_encode(['success' => false, 'error' => 'SQL Execution Failed: ' . $stmt->error]));
+    }
+
+    $stmt->close();
+}
 $stmt->execute();
 
 if ($stmt->affected_rows > 0) {

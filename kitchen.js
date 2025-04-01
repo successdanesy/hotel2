@@ -1,3 +1,50 @@
+// FUNCTIONS TO UPDATE MENU ITEM PRICE 
+document.addEventListener("DOMContentLoaded", function () {
+    const priceDisplay = document.getElementById("current_price");
+    const menuSelect = document.getElementById("menu_item");
+
+    // ✅ When a menu item is selected, reset price to ₦0
+    menuSelect.addEventListener("change", function () {
+        if (menuSelect.value) { 
+            priceDisplay.textContent = "₦0"; // Start from zero
+        } else {
+            priceDisplay.textContent = "₦0"; // Reset if no item is selected
+        }
+    });
+
+
+    // ✅ Handle price increment and decrement
+    document.querySelectorAll(".adjust-price").forEach(button => {
+        button.addEventListener("click", function () {
+            let changeAmount = parseInt(this.dataset.amount);
+            let currentPrice = parseFloat(priceDisplay.textContent.replace("₦", "").replace(",", "")) || 0;
+
+            let newPrice = Math.max(0, currentPrice + changeAmount);
+            priceDisplay.textContent = `₦${newPrice.toLocaleString()}`;
+        });
+    });
+
+    // ✅ Ensure price is included when adding to tray
+    // document.getElementById("addToTray").addEventListener("click", () => {
+    //     let menuItemId = menuSelect.value;
+    //     let menuItemText = menuSelect.selectedOptions[0]?.textContent || "";
+    //     let specialInstructions = document.getElementById("special_instructions").value;
+    //     let displayedPrice = parseFloat(priceDisplay.textContent.replace("₦", "").replace(",", "")) || 0;
+
+    //     if (!menuItemId) {
+    //         alert("Please select a menu item.");
+    //         return;
+    //     }
+
+    //     addItemToTray(menuItemId, menuItemText, displayedPrice, specialInstructions);
+    // });
+});
+
+
+
+
+
+
 // Function to fetch Guest ID by Room Number
 function fetchGuestId() {
     const roomNumber = document.getElementById('room_number').value;
@@ -42,56 +89,79 @@ function updateMenuItems(categoryId) {
         menuItemsByCategory[categoryId].forEach(item => {
             const option = document.createElement('option');
             option.value = item.id;
-            option.textContent = `${item.name} (₦${parseFloat(item.price).toFixed(2)})`;
+            option.textContent = item.name; // ✅ Only show item name, no price
             menuSelect.appendChild(option);
         });
     }
 }
 
+
 // Order Tray Logic
 const orderTray = [];
-const orderTrayTable = document.getElementById('orderTray').querySelector('tbody');
+const orderTrayTable = document.getElementById("orderTray").querySelector("tbody");
 
-// Add item to the tray
-document.getElementById('addToTray').addEventListener('click', () => {
-    const guestType = document.getElementById('guest_type').value;
-    const roomNumber = document.getElementById('room_number').value;
-    const menuItemId = document.getElementById('menu_item').value;
-    const menuItemText = document.getElementById('menu_item').selectedOptions[0]?.textContent || '';
-    const specialInstructions = document.getElementById('special_instructions').value;
+document.getElementById("addToTray").addEventListener("click", () => {
+    let menuItemId = document.getElementById("menu_item").value;
+    let menuItemText = document.getElementById("menu_item").selectedOptions[0]?.textContent || "";
+    let specialInstructions = document.getElementById("special_instructions").value;
+    let displayedPrice = parseFloat(document.getElementById("current_price").textContent.replace("₦", "").replace(",", "")) || 0;
 
-    if (guestType === 'guest' && (!roomNumber || !menuItemId)) {
-        alert('Please select a room and menu item.');
+    if (!menuItemId) {
+        alert("Please select a menu item.");
         return;
     }
 
-    if (guestType === 'non_guest' && !menuItemId) {
-        alert('Please select a menu item.');
-        return;
-    }
-
-    const price = parseFloat(menuItemText.match(/\(₦([\d.]+)\)/)?.[1] || 0);
-    addItemToTray(menuItemId, menuItemText, price, specialInstructions);
+    addItemToTray(menuItemId, menuItemText, displayedPrice, specialInstructions);
 });
 
-// Add item to tray and update the table
-function addItemToTray(menuItemId, menuItemText, price, specialInstructions) {
-    orderTray.push({ menuItemId, menuItemText, price, specialInstructions });
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${menuItemText}</td>
-        <td>₦${price.toFixed(2)}</td>
-        <td>${specialInstructions}</td>
-        <td><button class="remove-item">Remove</button></td>
-    `;
-    orderTrayTable.appendChild(row);
 
-    // Remove item from tray
-    row.querySelector('.remove-item').addEventListener('click', () => {
-        orderTray.splice(Array.from(orderTrayTable.children).indexOf(row), 1);
+function addItemToTray(menuItemId, menuItemText, price, specialInstructions) {
+    // ✅ Check if the item is already in the tray
+    let existingItem = orderTray.find(item => item.menuItemId === menuItemId);
+
+    if (existingItem) {
+        // ✅ If the item exists, increase the quantity
+        existingItem.quantity += 1;
+        existingItem.totalPrice += price;
+
+        // ✅ Update the quantity and price in the UI
+        let existingRow = document.getElementById(`row-${menuItemId}`);
+        existingRow.querySelector(".item-quantity").textContent = existingItem.quantity;
+        existingRow.querySelector(".item-price").textContent = `₦${existingItem.totalPrice.toLocaleString()}`;
+    } else {
+        // ✅ If the item is new, add it to the tray with quantity 1
+        let newItem = { menuItemId, menuItemText, price, totalPrice: price, specialInstructions, quantity: 1 };
+        orderTray.push(newItem);
+
+        const row = document.createElement("tr");
+        row.id = `row-${menuItemId}`;
+        row.innerHTML = `
+            <td>${menuItemText}</td>
+            <td class="item-quantity">1</td>
+            <td class="item-price">₦${price.toLocaleString()}</td>
+            <td>${specialInstructions}</td>
+            <td><button class="remove-item">Remove</button></td>
+        `;
+        orderTrayTable.appendChild(row);
+
+        // ✅ Remove item from tray when clicking the remove button
+        row.querySelector(".remove-item").addEventListener("click", () => {
+            let index = orderTray.findIndex(item => item.menuItemId === menuItemId);
+            if (index !== -1) {
+                orderTray.splice(index, 1);
+            }
+            row.remove();
+        });
+    }
+
+
+    // ✅ Remove item from tray
+    row.querySelector(".remove-item").addEventListener("click", () => {
+        orderTray.splice(orderTray.indexOf(menuItemId), 1);
         row.remove();
     });
 }
+
 
 // Submit Orders
 document.getElementById('submitOrders').addEventListener('click', () => {

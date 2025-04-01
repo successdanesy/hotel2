@@ -5,14 +5,14 @@ include('db_connect.php');
 
 if (!isset($_SESSION['username'])) {
     $_SESSION['msg'] = "You must log in first";
-    header('location: index.php');
+    header('location: login.php');
     exit();
 }
 
 if (isset($_GET['logout'])) {
     session_destroy();
     unset($_SESSION['username']);
-    header("location: index.php");
+    header("location: login.php");
     exit();
 }
 

@@ -5,14 +5,14 @@ include('db_connect.php');
 
 if (!isset($_SESSION['username'])) {
     $_SESSION['msg'] = "You must log in first";
-    header('location: index.php');
+    header('location: login.php');
     exit();
 }
 
 if (isset($_GET['logout'])) {
     session_destroy();
     unset($_SESSION['username']);
-    header("location: index.php");
+    header("location: login.php");
     exit();
 }
 
@@ -27,7 +27,9 @@ if (DateTime::createFromFormat('Y-m-d', $selected_date) === false) {
 }
 
 // Fetching Kitchen Orders based on the selected date
-$sql_kitchen = "SELECT * FROM kitchen_orders WHERE DATE(timestamp) = ?";
+$sql_kitchen = "SELECT id, room_number, order_description, quantity, total_amount, special_instructions, status, timestamp 
+                FROM kitchen_orders 
+                WHERE DATE(timestamp) = ?";
 $stmt_kitchen = $conn->prepare($sql_kitchen);
 $stmt_kitchen->bind_param("s", $selected_date);
 $stmt_kitchen->execute();
@@ -55,7 +57,7 @@ $stmt_bar->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antilla Front Desk</title>
-    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="home.css">>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -104,24 +106,29 @@ $stmt_bar->close();
                 <section class="kitchen-order">
                     <h2>Kitchen Order - Antilla Apartments & Suites</h2>
                     <table id="kitchen-orders">
-                        <tr>
-                            <th>Room Number</th>
-                            <th>Order Description</th>
-                            <th>Total Amount (₦)</th>
-                            <th>Status</th>
-                            <th>Special Instructions</th>
-                        </tr>
+                <tr>
+                    <th>Room Number</th>
+                    <th>Order Description</th>
+                    <th>Quantity</th> <!-- ✅ Added Quantity Column -->
+                    <th>Total Amount (₦)</th>
+                    <th>Status</th>
+                    <th>Special Instructions</th>
+                </tr>
+
                         <?php
                             if ($result_kitchen->num_rows > 0) {
                                 while ($order = $result_kitchen->fetch_assoc()) {
                                     echo "<tr>";
                                     echo "<td>" . htmlspecialchars($order['room_number']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($order['order_description']) . "</td>";
+                                    echo "<td>" . htmlspecialchars(string: $order['order_description']) . "</td>";
+                                    echo "<td>" . htmlspecialchars(string: $order['quantity'] . 'N/A') . "</td>"; // ✅ Show Quantity
                                     echo "<td>" . number_format($order['total_amount'], 2) . "</td>";
                                     echo "<td>" . htmlspecialchars($order['status']) . "</td>";
                                     echo "<td>" . htmlspecialchars($order['special_instructions']) . "</td>";
                                     echo "</tr>";
                                 }
+
+                            
                             } else {
                                 echo "<tr><td colspan='5'>No kitchen orders available for the selected date.</td></tr>";
                             }
@@ -133,24 +140,28 @@ $stmt_bar->close();
                 <section class="bar-order">
                     <h2>Bar Order - Antilla Apartments & Suites</h2>
                     <table id="bar-orders">
-                        <tr>
-                            <th>Room Number</th>
-                            <th>Order Description</th>
-                            <th>Total Amount (₦)</th>
-                            <th>Status</th>
-                            <th>Special Instructions</th>
-                        </tr>
-                        <?php
+                <tr>
+                        <th>Room Number</th>
+                        <th>Order Description</th>
+                        <th>Quantity</th> <!-- ✅ Added Quantity Column -->
+                        <th>Total Amount (₦)</th>
+                        <th>Status</th>
+                        <th>Special Instructions</th>
+                </tr>
+                <?php
+
                             if ($result_bar->num_rows > 0) {
                                 while ($order = $result_bar->fetch_assoc()) {
                                     echo "<tr>";
                                     echo "<td>" . htmlspecialchars($order['room_number']) . "</td>";
                                     echo "<td>" . htmlspecialchars($order['order_description']) . "</td>";
+                                    echo "<td>" . htmlspecialchars(string: $order['quantity'] . 'N/A') . "</td>"; // ✅ Show Quantity
                                     echo "<td>" . number_format($order['total_amount'], 2) . "</td>";
                                     echo "<td>" . htmlspecialchars($order['status']) . "</td>";
                                     echo "<td>" . htmlspecialchars($order['special_instructions']) . "</td>";
                                     echo "</tr>";
                                 }
+
                             } else {
                                 echo "<tr><td colspan='5'>No bar orders available for the selected date.</td></tr>";
                             }
