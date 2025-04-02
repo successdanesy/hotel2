@@ -1,20 +1,19 @@
 <?php
-$url = getenv('JAWSDB_URL');
-$dbparts = parse_url($url);
+$servername = "zpfp07ebhm2zgmrm.chr7pe7iynqr.eu-west-1.rds.amazonaws.com";
+$username = "hy7x3wktu25w0pae";
+$password = "ak9uacoz59zlwhiv";
+$database = "l1oe4lyo2lg1i3dg";
+$port = 3306; // MySQL default port
 
-$hostname = $dbparts['host'];
-$username = $dbparts['user'];
-$password = $dbparts['pass'];
-$database = ltrim($dbparts['path'],'/');
 // Create connection
-$conn = new mysqli($hostname, $username, $password, $database);
+$conn = new mysqli($servername, $username, $password, $database, $port);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-//echo "Connection was successfully established!";
 ?>
+
 
 
 
