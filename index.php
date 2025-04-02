@@ -1,4 +1,11 @@
 <?php 
+// Force HTTPS redirect
+if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
+    $redirect = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    header("Location: $redirect", true, 301);
+    exit();
+}
+
 session_start();
 include('db_connect.php'); // Include the database connection
 
