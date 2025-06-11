@@ -52,7 +52,7 @@ img/
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/yourusername/your-repo.git
+   git clone https://github.com/successdanesy/hotel2.git
    ```
 2. **Import the database:**
    - Use phpMyAdmin or MySQL CLI to import the provided SQL file (if available).
