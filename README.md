@@ -55,7 +55,7 @@ img/
    git clone https://github.com/successdanesy/hotel2.git
    ```
 2. **Import the database:**
-   - Use phpMyAdmin or MySQL CLI to import the provided SQL file (if available).
+   - Use phpMyAdmin or MySQL CLI to import the "project.sql" SQL file in the repository.
 3. **Configure database connection:**
    - Edit `hotel2/db_connect.php` with your MySQL credentials.
 4. **Run locally:**
