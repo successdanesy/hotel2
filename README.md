@@ -67,12 +67,12 @@ img/
 
 ## 📸 Screenshots
 
-<img src="assets/login.png" alt="login view" width="100%"/>
-<img src="assets/frontdesk.png" alt="frontdesk view" width="100%"/>
-<img src="assets/room-management.png" alt="room-management view" width="100%"/>
-<img src="assets/kitchen-orders.png" alt="kitchen-orders view" width="100%"/>
-<img src="assets/imprest-request.png" alt="imprest-request view" width="100%"/>
-<img src="assets/manager-income.png" alt="manager-income view" width="100%"/>
+<img src="Assets/login.png" alt="login view" width="100%"/>
+<img src="Assets/frontdesk.png" alt="frontdesk view" width="100%"/>
+<img src="Assets/room-management.png" alt="room-management view" width="100%"/>
+<img src="Assets/kitchen-orders.png" alt="kitchen-orders view" width="100%"/>
+<img src="Assets/imprest-request.png" alt="imprest-request view" width="100%"/>
+<img src="Assets/manager-income.png" alt="manager-income view" width="100%"/>
 
 ---
 
