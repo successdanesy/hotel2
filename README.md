@@ -76,12 +76,6 @@ img/
 
 ---
 
-## 📄 License
-
-MIT License (or specify your license)
-
----
-
 ## 🙌 Contributions
 
 Built with love by [Success Chukwuemeka](https://www.linkedin.com/in/success-chu) 💡  
